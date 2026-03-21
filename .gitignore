@@ -39,3 +39,12 @@
 
 # debug information files
 *.dwo
+
+# idea files
+.idea/*
+
+# latex compile files
+*.aux
+*.log
+*.gz
+/SequentSystemsAndTruthTrees.synctex.gz

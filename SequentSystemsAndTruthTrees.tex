@@ -1,0 +1,84 @@
+\documentclass[12pt, letterpaper]{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usepackage{geometry}
+\geometry{legalpaper, portrait, margin=1in}
+
+\lstset{columns=fullflexible, breaklines=true}
+\renewcommand\qedsymbol{$\blacksquare$}
+\usetikzlibrary{automata}
+
+\title{Converting between Sequent Systems and Truth Trees}
+\author{Andrew Nazareth and Andrii Bonenberger}
+
+\begin{document}
+
+\maketitle
+\pagebreak
+
+\newcommand \sep \Rightarrow
+
+\section*{Sequent System Rules (Propositional Calculus)}
+
+The sequent system we are using has the following rules of operation. $\Gamma$ and $\Delta$ are sets (multisets) and A and B are atomics.
+\subsection*{Operational Rules}
+\subsubsection*{Negation}
+\[
+\frac{\Gamma \sep \Delta, A}{\neg A, \Gamma \sep \Delta} \neg L
+\qquad \qquad
+\frac{A, \Gamma \sep \Delta}{\Gamma \sep \Delta, \neg A} \neg R
+\]
+\subsubsection*{Conjunction}
+\[
+\frac{A, B, \Gamma \sep \Delta}{A \land B, \Gamma \sep \Delta} \land L
+\qquad \qquad
+\frac{\Gamma \sep \Delta, A \qquad \Gamma \sep \Delta, B}{\Gamma \sep \Delta, A \land B} \land R
+\]
+\subsubsection*{Disjunction}
+\[
+\frac{A, \Gamma \sep \Delta \qquad B, \Gamma \sep \Delta}{A \lor B, \Gamma \sep \Delta} \lor L
+\qquad \qquad
+\frac{\Gamma \sep \Delta, A, B}{\Gamma \sep \Delta, A \lor B} \lor R
+\]
+\subsubsection*{Implication}
+\[
+\frac{\Gamma \sep \Delta, A \qquad B, \Pi \sep \Lambda}{A \to B, \Gamma, \Pi \sep \Delta, \Lambda} \to L
+\qquad \qquad
+\frac{A, \Gamma \sep \Delta, B}{\Gamma \sep \Delta, A \to B} \to R
+\]
+\subsection*{Structural Rules}
+\subsubsection*{Weakening}
+\[
+\frac{\Gamma \sep \Delta}{A, \Gamma \sep \Delta} WL
+\qquad \qquad
+\frac{\Gamma \sep \Delta}{\Gamma \sep \Delta, A} WR
+\]
+\subsubsection*{Contraction}
+\[
+\frac{A, A, \Gamma \sep \Delta}{A, \Gamma \sep \Delta} CL
+\qquad \qquad
+\frac{\Gamma \sep \Delta, A, A}{\Gamma \sep \Delta, A} CR
+\]
+\subsubsection*{Exchange}
+\[
+\frac{\Gamma, A, B, \Pi \sep \Delta}{\Gamma, B, A, \Pi \sep \Delta} XL
+\qquad \qquad
+\frac{\Gamma \sep \Delta, A, B, \Lambda}{\Gamma \sep \Delta, B, A, \Lambda} XR
+\]
+\pagebreak
+
+\section*{Truth Tree Rules (Propositional Calculus)}
+\subsection*{Decomposition Rules}
+\subsection*{Closure Rules}
+\pagebreak
+
+\section*{Putting them together}
+
+\end{document}
