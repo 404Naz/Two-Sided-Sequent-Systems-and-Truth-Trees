@@ -23,11 +23,11 @@ public:
     BinaryLogicExpression() = delete;
     BinaryLogicExpression(const BinaryLogicExpression& other)
     {
-        SetLeftOp(other.GetLeftOperand());
-        SetRightOp(other.GetRightOperand());
+        SetLeftOp(other.left);
+        SetRightOp(other.right);
     }
 
-    BinaryLogicExpression(const LeftT& leftOp, const RightT& rightOp)
+    explicit BinaryLogicExpression(const LeftT& leftOp, const RightT& rightOp)
     {
         SetLeftOp(leftOp);
         SetRightOp(rightOp);

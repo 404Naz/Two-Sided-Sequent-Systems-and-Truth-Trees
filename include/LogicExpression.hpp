@@ -9,6 +9,7 @@
 
 namespace Logic_Project {
 enum class ExpressionType {
+    None,
     And,
     Or,
     Not,
@@ -18,6 +19,7 @@ enum class ExpressionType {
 };
 
 enum class ExpressionCategory {
+    None,
     LeafExpression,
     UnaryExpression,
     BinaryExpression,
@@ -26,7 +28,6 @@ enum class ExpressionCategory {
 class LogicExpression {
 public:
     virtual ~LogicExpression() = default;
-    LogicExpression();
     /**
      * Copies this expression.
      * @return A copy of this expression.
@@ -47,13 +48,13 @@ public:
      * Gets the category of this expression.
      * @return The category of this expression.
      */
-    [[nodiscard]] virtual auto GetCategory() const -> ExpressionCategory;
+    [[nodiscard]] virtual ExpressionCategory GetCategory() const;
 
     /**
      * Gets the type of this expression.
      * @return The type of this expression.
      */
-    [[nodiscard]] virtual auto GetType() const -> ExpressionType;
+    [[nodiscard]] virtual ExpressionType GetType() const;
 
     /**
      * Converts this expression to a more general expression.
@@ -65,7 +66,10 @@ public:
      *
      * @return The generalized expression.
      */
-    [[nodiscard]] virtual auto Generalize() const -> std::unique_ptr<LogicExpression> = 0;
+    [[nodiscard]] virtual std::unique_ptr<LogicExpression> Generalize() const
+    {
+        return Copy();
+    }
 
     /**
      * Gets whether this expression is of a specific type.
