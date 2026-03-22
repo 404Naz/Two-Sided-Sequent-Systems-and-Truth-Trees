@@ -6,8 +6,16 @@
 #include "BinaryLogicExpression.hpp"
 #include "LeafLogicExpression.hpp"
 #include "UnaryLogicExpression.hpp"
+#include "LogicalAtom.hpp"
 
 int main(int argc, char **argv) {
+    Logic_Project::LogicalAtom A{"A"};
+    Logic_Project::LogicalAtom A2{"A"};
+    Logic_Project::LogicalAtom B{"B"};
     std::print("MAIN {}", argc);
+
+    std::print("{}", A.GetRepresentation());
+
     return EXIT_SUCCESS;
 }
+
