@@ -65,7 +65,7 @@ public:
      *
      * @return The generalized expression.
      */
-    [[nodiscard]] virtual auto Generalize() const -> std::unique_ptr<LogicExpression>;
+    [[nodiscard]] virtual auto Generalize() const -> std::unique_ptr<LogicExpression> = 0;
 
     /**
      * Gets whether this expression is of a specific type.

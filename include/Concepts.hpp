@@ -4,12 +4,24 @@
 
 #ifndef SEQUENTSYSTEMSTOTRUTHTREES_CONCEPTS_HPP
 #define SEQUENTSYSTEMSTOTRUTHTREES_CONCEPTS_HPP
+#include <concepts>
 
 namespace Logic_Project {
 
 // Forward declarations
-class Expression;
+class LogicExpression;
 enum class ExpressionType;
+enum class ExpressionCategory;
+
+/**
+ * Checks if type T is same as any of the provided types in U.
+ *
+ * @tparam T The type to compare against.
+ * @tparam U The comparision types.
+ * @return true if T is same as any type in U, false otherwise.
+ */
+template <typename T, typename... U>
+concept IsAnyOf = (std::same_as<T, U> || ...);
 
 /**
  * An expression concept.
@@ -25,14 +37,14 @@ enum class ExpressionType;
  * @tparam T The type to check.
  */
 template <typename T>
-concept IExpression = (requires(T, const Expression& other) {
+concept IExpression = (requires(T, const LogicExpression& other) {
     {
         T::GetStaticCategory()
-    } -> std::same_as<uint32_t>;
+    } -> std::same_as<ExpressionCategory>;
     {
         T::GetStaticType()
     } -> std::same_as<ExpressionType>;
-} && std::derived_from<T, Expression>) || std::is_same_v<T, Expression>;
+} && std::derived_from<T, LogicExpression>) || std::is_same_v<T, LogicExpression>;
 
 
 }

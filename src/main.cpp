@@ -3,6 +3,9 @@
 //
 #include <cstdlib>
 #include <print>
+#include "BinaryLogicExpression.hpp"
+#include "LeafLogicExpression.hpp"
+#include "UnaryLogicExpression.hpp"
 
 int main(int argc, char **argv) {
     std::print("MAIN {}", argc);
