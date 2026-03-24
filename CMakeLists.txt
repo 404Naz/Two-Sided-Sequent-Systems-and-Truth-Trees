@@ -21,6 +21,8 @@ include(Catch)
 add_library(project_lib
         src/LogicalAtom.cpp
         src/LogicExpression.cpp
+        src/LogicalAnd.cpp
+        src/LogicalNot.cpp
 )
 
 target_include_directories(project_lib PUBLIC include)

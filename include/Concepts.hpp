@@ -46,6 +46,24 @@ concept IExpression = (requires(T, const LogicExpression& other) {
     } -> std::same_as<ExpressionType>;
 } && std::derived_from<T, LogicExpression>) || std::is_same_v<T, LogicExpression>;
 
+template <template <IExpression, IExpression> class DerivedT, IExpression MostSigOpT, IExpression LeastSigOpT>
+class BinaryLogicExpression;
+
+template <template <IExpression> class DerivedT, IExpression OpT>
+class UnaryLogicExpression;
+
+/**
+ * These are lambdas that try to cast Derived d to Binary or to Unary to check if they are derived from.
+ */
+template <typename Derived>
+concept DerivedFromBinaryExpression = requires(Derived& d) {
+    []<template <typename, typename> typename D, IExpression T, IExpression U>(BinaryLogicExpression<D, T, U>&) { }(d);
+};
+
+template <typename Derived>
+concept DerivedFromUnaryExpression = requires(Derived& d) {
+    []<template <typename> typename D, IExpression T>(UnaryLogicExpression<D, T>&) { }(d);
+};
 
 }
 
