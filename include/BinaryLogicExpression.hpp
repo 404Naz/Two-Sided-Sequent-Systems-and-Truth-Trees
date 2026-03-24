@@ -5,6 +5,7 @@
 #ifndef SEQUENTSYSTEMSTOTRUTHTREES_BINARYLOGICEXPRESSION_HPP
 #define SEQUENTSYSTEMSTOTRUTHTREES_BINARYLOGICEXPRESSION_HPP
 #include "LogicExpression.hpp"
+#include "RecursiveCast.hpp"
 #include <cassert>
 
 namespace Logic_Project {
@@ -15,16 +16,16 @@ namespace Logic_Project {
  * @tparam LeftT Type of the left operand
  * @tparam RightT Type of the right operand
  */
-template <template<IExpression, IExpression> class DerivedT, typename LeftT, typename RightT>
+template <template<IExpression, IExpression> class DerivedT, IExpression LeftT = LogicExpression, IExpression RightT = LeftT>
 class BinaryLogicExpression : public LogicExpression {
     using DerivedSpecialized = DerivedT<LeftT, RightT>;
     using DerivedGeneralized = DerivedT<LogicExpression, LogicExpression>;
 public:
-    BinaryLogicExpression() = delete;
+    BinaryLogicExpression() = default;
     BinaryLogicExpression(const BinaryLogicExpression& other)
     {
-        SetLeftOp(other.left);
-        SetRightOp(other.right);
+        this->left = other.left->Copy();
+        this->right = other.right->Copy();
     }
 
     explicit BinaryLogicExpression(const LeftT& leftOp, const RightT& rightOp)
@@ -35,7 +36,7 @@ public:
 
     [[nodiscard]] std::unique_ptr<LogicExpression> Copy() const final
     {
-        return std::unique_ptr<LogicExpression>(*static_cast<const DerivedSpecialized*>(this));
+        return std::make_unique<DerivedSpecialized>(*static_cast<const DerivedSpecialized*>(this));
     }
     [[nodiscard]] bool Equals(const LogicExpression& other) const final
     {
@@ -55,7 +56,7 @@ public:
      * Gets the left operand.
      * @return The left operand
      */
-    [[nodiscard]] std::unique_ptr<LogicExpression> GetLeftOperand() const
+    [[nodiscard]] const LeftT& GetLeftOperand() const
     {
         assert(left != nullptr);
         return *left;
@@ -64,7 +65,7 @@ public:
      * Gets the right operand.
      * @return The right operand
      */
-    [[nodiscard]] std::unique_ptr<LogicExpression> GetRightOperand() const
+    [[nodiscard]] const RightT& GetRightOperand() const
     {
         assert(right != nullptr);
         return *right;
@@ -77,18 +78,47 @@ private:
      * @param op the operand to set
      */
     template <typename T> requires IsAnyOf<T, LeftT, LogicExpression>
-    void SetLeftOp(const LeftT& op)
+    bool SetLeftOp(const LeftT& op)
     {
-        this->left = op;
+        if constexpr (std::same_as<LeftT, LogicExpression>) {
+            this->left = op.Copy();
+            return true;
+        }
+
+        if constexpr (std::same_as<LeftT, T> && !std::same_as<LeftT, LogicExpression>) {
+            this->left = std::make_unique<LeftT>(op);
+            return true;
+        }
+
+        if (auto castedOp = RecursiveCast<LeftT>(op); castedOp) {
+            left = std::move(castedOp);
+            return true;
+        }
+        return false;
     }
     /**
      * Sets the least significant operand of this expression.
      * @param op the operand to set
      */
     template <typename T> requires IsAnyOf<T, RightT, LogicExpression>
-    void SetRightOp(const RightT& op)
+    bool SetRightOp(const RightT& op)
     {
-        this->right = op;
+        if constexpr (std::same_as<RightT, LogicExpression>) {
+            this->right = op.Copy();
+            return true;
+        }
+
+        if constexpr (std::same_as<RightT, T> && !std::same_as<RightT, LogicExpression>) {
+            this->right = std::make_unique<RightT>(op);
+            return true;
+        }
+
+        if (auto castedOp = RecursiveCast<RightT>(op); castedOp) {
+            right = std::move(castedOp);
+            return true;
+        }
+
+        return false;
     }
     std::unique_ptr<LeftT> left;
     std::unique_ptr<RightT> right;

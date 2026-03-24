@@ -5,6 +5,7 @@
 #ifndef SEQUENTSYSTEMSTOTRUTHTREES_UNARYLOGICEXPRESSION_HPP
 #define SEQUENTSYSTEMSTOTRUTHTREES_UNARYLOGICEXPRESSION_HPP
 #include "LogicExpression.hpp"
+#include <cassert>
 
 namespace Logic_Project {
 /**
@@ -12,15 +13,15 @@ namespace Logic_Project {
  * @tparam DerivedT Type of the derived class
  * @tparam OpT Type of the operand
  */
-template <template<IExpression> class DerivedT, typename OpT>
+template <template<IExpression> class DerivedT, IExpression OpT = LogicExpression>
 class UnaryLogicExpression : public LogicExpression {
 public:
     using DerivedSpecialized = DerivedT<OpT>;
     using DerivedGeneralized = DerivedT<LogicExpression>;
-    UnaryLogicExpression() = delete;
+    UnaryLogicExpression() = default;
     UnaryLogicExpression(const UnaryLogicExpression& other)
     {
-        SetOperand(other.operand);
+        this->operand = other.operand->Copy();
     }
     explicit UnaryLogicExpression(const OpT& op)
     {
@@ -28,7 +29,7 @@ public:
     }
     [[nodiscard]] std::unique_ptr<LogicExpression> Copy() const final
     {
-        return std::unique_ptr<LogicExpression>(*static_cast<const DerivedSpecialized*>(this));
+        return std::make_unique<DerivedSpecialized>(*static_cast<const DerivedSpecialized*>(this));
     }
     [[nodiscard]] bool Equals(const LogicExpression& other) const final
     {
@@ -36,13 +37,13 @@ public:
             return false;
         }
 
-        // Other should be a binary expression so it should have a left and right operand.
+        // Other should be a unary expression so it should have one operand
         const auto otherGeneralized = other.Generalize();
         const auto& otherUnaryGeneralized = static_cast<const DerivedGeneralized&>(*otherGeneralized);
 
         return this->operand->Equals(otherUnaryGeneralized.GetOperand());
     }
-    [[nodiscard]] std::unique_ptr<LogicExpression> GetOperand() const
+    [[nodiscard]] const OpT& GetOperand() const
     {
         assert (operand != nullptr);
         return *operand;

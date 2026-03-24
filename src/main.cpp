@@ -7,6 +7,8 @@
 #include "LeafLogicExpression.hpp"
 #include "UnaryLogicExpression.hpp"
 #include "LogicalAtom.hpp"
+#include "LogicalAnd.hpp"
+#include "LogicalNot.hpp"
 
 int main(int argc, char **argv) {
     Logic_Project::LogicalAtom A{"A"};
