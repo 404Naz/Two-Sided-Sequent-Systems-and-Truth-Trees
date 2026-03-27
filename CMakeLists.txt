@@ -23,6 +23,8 @@ add_library(project_lib
         src/LogicExpression.cpp
         src/LogicalAnd.cpp
         src/LogicalNot.cpp
+        src/LogicalConditional.cpp
+        src/LogicalOr.cpp
 )
 
 target_include_directories(project_lib PUBLIC include)
