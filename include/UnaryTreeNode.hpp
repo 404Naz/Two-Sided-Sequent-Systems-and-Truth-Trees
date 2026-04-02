@@ -9,8 +9,20 @@
 namespace Logic_Project {
 class UnaryTreeNode final : public TreeNode {
     public:
-    UnaryTreeNode();
+    UnaryTreeNode() = default;
+    UnaryTreeNode(const UnaryTreeNode& other);
+    explicit UnaryTreeNode(const LogicExpression& statement);
+    UnaryTreeNode(const LogicExpression& statement, const TreeNode& parent);
+    UnaryTreeNode(const LogicExpression& statement, const TreeNode& parent, const TreeNode& child);
 
+    std::any Accept(TreeVisitor& visitor) override;
+    [[nodiscard]] std::unique_ptr<TreeNode> Copy() const override;
+
+    [[nodiscard]] bool HasChild() const;
+    void SetChild(const TreeNode& newChild);
+
+    // Statement represented by this node
+    std::unique_ptr<LogicExpression> statement;
     std::unique_ptr<TreeNode> child;
 };
 }

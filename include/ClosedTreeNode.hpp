@@ -10,6 +10,9 @@ namespace Logic_Project {
 class ClosedTreeNode final : public LeafTreeNode {
     public:
     ClosedTreeNode();
+
+    std::any Accept(TreeVisitor& visitor) override;
+    [[nodiscard]] std::unique_ptr<TreeNode> Copy() const override;
 };
 }
 
