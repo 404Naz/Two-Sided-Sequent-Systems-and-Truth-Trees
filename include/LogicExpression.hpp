@@ -15,7 +15,8 @@ enum class ExpressionType {
     Not,
     Conditional,
     Biconditional,
-    Atomic
+    Atomic,
+    Contradiction,
 };
 
 enum class ExpressionCategory {

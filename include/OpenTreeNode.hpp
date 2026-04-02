@@ -6,9 +6,12 @@
 #define SEQUENTSYSTEMSTOTRUTHTREES_OPENTREENODE_HPP
 #include "LeafTreeNode.hpp"
 namespace Logic_Project {
-class OpenTreeNode final : LeafTreeNode {
+class OpenTreeNode final : public LeafTreeNode {
     public:
     OpenTreeNode();
+
+    std::any Accept(TreeVisitor& visitor) override;
+    [[nodiscard]] std::unique_ptr<TreeNode> Copy() const override;
 };
 }
 

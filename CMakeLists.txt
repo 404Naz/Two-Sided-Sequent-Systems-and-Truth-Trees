@@ -20,11 +20,17 @@ include(Catch)
 # Create a library for project code, update with new cpp files
 add_library(project_lib
         src/LogicalAtom.cpp
+        src/LogicalContradiction.cpp
         src/LogicExpression.cpp
         src/LogicalAnd.cpp
         src/LogicalNot.cpp
         src/LogicalConditional.cpp
         src/LogicalOr.cpp
+        src/BinaryTreeNode.cpp
+        src/UnaryTreeNode.cpp
+        src/TreeNode.cpp
+        src/ClosedTreeNode.cpp
+        src/OpenTreeNode.cpp
 )
 
 target_include_directories(project_lib PUBLIC include)
@@ -37,6 +43,7 @@ add_executable(SequentSystemsToTruthTrees
 # test executable, update with new files
 add_executable(tests
         tests/LogicalAtomTests.cpp
+        tests/TreeNodeTests.cpp
 )
 
 target_link_libraries(SequentSystemsToTruthTrees PRIVATE project_lib)

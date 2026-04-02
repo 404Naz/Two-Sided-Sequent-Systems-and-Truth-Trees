@@ -72,11 +72,18 @@ The sequent system we are using has the following rules of operation. $\Gamma$ a
 \qquad \qquad
 \frac{\Gamma \sep \Delta, A, B, \Lambda}{\Gamma \sep \Delta, B, A, \Lambda} XR
 \]
+\subsection*{File Layout}
+The sequent system will be formatted as a json with a list of nodes containing their node ID, antecedent/succedent, the node ids used to get there and the rule used to get there, going from goal upwards. For example, the following sequent:
+$$\frac{\frac{\frac{A \sep A}{B, A \sep A}WL}{A, B \sep A}XL \qquad \frac{B \sep B}{A, B \sep B}WL}{A, B\sep A \land B} \land R$$
+would be represented as:
+!!! TODO !!!
 \pagebreak
 
 \section*{Truth Tree Rules (Propositional Calculus)}
 \subsection*{Decomposition Rules}
 \subsection*{Closure Rules}
+\subsection*{File Layout}
+The truth tree will be formatted into a json-like form for use in Willow. 
 \pagebreak
 
 \section*{Putting them together}
