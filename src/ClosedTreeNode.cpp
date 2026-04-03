@@ -8,9 +8,11 @@ namespace Logic_Project {
  ClosedTreeNode::ClosedTreeNode()
      : LeafTreeNode()
 {
+     decomposition1 = 0;
+     decomposition2 = 0;
 }
 
-std::any ClosedTreeNode::Accept(TreeVisitor& visitor)
+std::any ClosedTreeNode::Accept(TreeVisitor& visitor) const
 {
      return visitor.Visit(*this);
 }

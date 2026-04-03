@@ -11,8 +11,11 @@ class ClosedTreeNode final : public LeafTreeNode {
     public:
     ClosedTreeNode();
 
-    std::any Accept(TreeVisitor& visitor) override;
+    std::any Accept(TreeVisitor& visitor) const override;
     [[nodiscard]] std::unique_ptr<TreeNode> Copy() const override;
+
+    int decomposition1;
+    int decomposition2;
 };
 }
 

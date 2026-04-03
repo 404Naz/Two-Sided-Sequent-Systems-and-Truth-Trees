@@ -15,7 +15,7 @@ class UnaryTreeNode final : public TreeNode {
     UnaryTreeNode(const LogicExpression& statement, const TreeNode& parent);
     UnaryTreeNode(const LogicExpression& statement, const TreeNode& parent, const TreeNode& child);
 
-    std::any Accept(TreeVisitor& visitor) override;
+    std::any Accept(TreeVisitor& visitor) const override;
     [[nodiscard]] std::unique_ptr<TreeNode> Copy() const override;
 
     [[nodiscard]] bool HasChild() const;

@@ -10,7 +10,7 @@ class OpenTreeNode final : public LeafTreeNode {
     public:
     OpenTreeNode();
 
-    std::any Accept(TreeVisitor& visitor) override;
+    std::any Accept(TreeVisitor& visitor) const override;
     [[nodiscard]] std::unique_ptr<TreeNode> Copy() const override;
 };
 }

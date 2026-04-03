@@ -31,6 +31,7 @@ add_library(project_lib
         src/TreeNode.cpp
         src/ClosedTreeNode.cpp
         src/OpenTreeNode.cpp
+        src/TreeSerializer.cpp
 )
 
 target_include_directories(project_lib PUBLIC include)
@@ -44,6 +45,7 @@ add_executable(SequentSystemsToTruthTrees
 add_executable(tests
         tests/LogicalAtomTests.cpp
         tests/TreeNodeTests.cpp
+        tests/TreeSerializerTests.cpp
 )
 
 target_link_libraries(SequentSystemsToTruthTrees PRIVATE project_lib)

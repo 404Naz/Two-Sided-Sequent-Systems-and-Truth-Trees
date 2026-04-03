@@ -58,7 +58,7 @@ BinaryTreeNode::BinaryTreeNode(const BinaryTreeNode& other)
     this->statement = other.statement->Copy();
 }
 
-std::any BinaryTreeNode::Accept(TreeVisitor& visitor)
+std::any BinaryTreeNode::Accept(TreeVisitor& visitor) const
 {
     return visitor.Visit(*this);
 }

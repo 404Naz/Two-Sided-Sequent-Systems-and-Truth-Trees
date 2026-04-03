@@ -22,7 +22,7 @@ UnaryTreeNode::UnaryTreeNode(const LogicExpression& statement, const TreeNode& p
 {
 }
 
-std::any UnaryTreeNode::Accept(TreeVisitor& visitor)
+std::any UnaryTreeNode::Accept(TreeVisitor& visitor) const
 {
     return visitor.Visit(*this);
 }

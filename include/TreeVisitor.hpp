@@ -18,8 +18,8 @@ class OpenTreeNode;
 
 class TreeVisitor {
 public:
-    TreeVisitor();
-    virtual ~TreeVisitor() = 0;
+    TreeVisitor() = default;
+    virtual ~TreeVisitor() = default;
     virtual std::any Visit(const UnaryTreeNode& unary) = 0;
     virtual std::any Visit(const BinaryTreeNode& binary) = 0;
     virtual std::any Visit(const ClosedTreeNode& closed) = 0;
