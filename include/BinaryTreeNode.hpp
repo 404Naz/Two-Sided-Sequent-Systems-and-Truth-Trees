@@ -18,7 +18,7 @@ class BinaryTreeNode final : public TreeNode {
     BinaryTreeNode(const LogicExpression& statement, const TreeNode& parent);
     BinaryTreeNode(const LogicExpression& statement, const TreeNode& parent, const TreeNode& left, const TreeNode& right);
 
-    std::any Accept(TreeVisitor& visitor) override;
+    std::any Accept(TreeVisitor& visitor) const override;
 
     [[nodiscard]] std::unique_ptr<TreeNode> Copy() const override;
 

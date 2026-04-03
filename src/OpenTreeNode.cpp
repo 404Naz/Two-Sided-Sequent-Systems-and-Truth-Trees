@@ -10,7 +10,7 @@ OpenTreeNode::OpenTreeNode()
 {
 }
 
-std::any OpenTreeNode::Accept(TreeVisitor& visitor)
+std::any OpenTreeNode::Accept(TreeVisitor& visitor) const
 {
     return visitor.Visit(*this);
 }

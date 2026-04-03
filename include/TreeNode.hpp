@@ -18,7 +18,7 @@ class TreeNode {
     TreeNode(const TreeNode& node);
     virtual ~TreeNode() = default;
 
-    virtual std::any Accept(TreeVisitor& visitor) = 0;
+    virtual std::any Accept(TreeVisitor& visitor) const = 0;
 
     void SetParent(const TreeNode& node);
     [[nodiscard]] bool HasParent() const;
@@ -26,13 +26,6 @@ class TreeNode {
     [[nodiscard]] virtual std::unique_ptr<TreeNode> Copy() const = 0;
 
     [[nodiscard]] int GetId() const;
-
-    // TODO: MOVE THESE TO VISITOR
-    // // Expressions that haven't been decomposed
-    // std::deque<std::unique_ptr<LogicExpression>> expressions;
-    //
-    // // Atomics or their negations
-    // std::vector<std::unique_ptr<LogicExpression>> env;
 
     // Parent pointer to get what it decomposes from
     std::unique_ptr<TreeNode> parent;
