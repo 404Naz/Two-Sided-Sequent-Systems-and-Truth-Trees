@@ -5,6 +5,8 @@
 #include "LogicalContradiction.hpp"
 
 namespace Logic_Project {
-
-
+std::string LogicalContradiction::Serialize() const
+{
+    return "⊥";
+}
 }

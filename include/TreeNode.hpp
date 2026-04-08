@@ -20,7 +20,7 @@ class TreeNode {
 
     virtual std::any Accept(TreeVisitor& visitor) const = 0;
 
-    void SetParent(const TreeNode& node);
+    void SetParent(TreeNode& node);
     [[nodiscard]] bool HasParent() const;
 
     [[nodiscard]] virtual std::unique_ptr<TreeNode> Copy() const = 0;
@@ -28,7 +28,7 @@ class TreeNode {
     [[nodiscard]] int GetId() const;
 
     // Parent pointer to get what it decomposes from
-    std::unique_ptr<TreeNode> parent;
+    TreeNode* parent;
 
     protected:
     static int globalId;

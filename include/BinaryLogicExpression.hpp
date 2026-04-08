@@ -24,14 +24,16 @@ public:
     BinaryLogicExpression() = default;
     BinaryLogicExpression(const BinaryLogicExpression& other)
     {
-        this->left = other.left->Copy();
-        this->right = other.right->Copy();
+        if (other.HasLeftOperand() and other.HasRightOperand()) {
+            SetLeftOperand(other.GetLeftOperand());
+            SetRightOperand(other.GetRightOperand());
+        }
     }
 
     explicit BinaryLogicExpression(const LeftT& leftOp, const RightT& rightOp)
     {
-        SetLeftOp(leftOp);
-        SetRightOp(rightOp);
+        SetLeftOperand(leftOp);
+        SetRightOperand(rightOp);
     }
 
     [[nodiscard]] std::unique_ptr<LogicExpression> Copy() const final
@@ -50,6 +52,21 @@ public:
 
         return this->left->Equals(otherBinaryGeneralized.GetLeftOperand()) && \
                this->right->Equals(otherBinaryGeneralized.GetRightOperand());
+    }
+
+    [[nodiscard]] std::string Serialize() const override
+    {
+        return Generalize()->Serialize();
+    }
+
+    [[nodiscard]] bool HasLeftOperand() const
+    {
+        return this->left != nullptr;
+    }
+
+    [[nodiscard]] bool HasRightOperand() const
+    {
+        return this->right != nullptr;
     }
 
     /**
@@ -74,11 +91,11 @@ public:
     EXPRESSION_CATEGORY(BinaryExpression)
 private:
     /**
-     * Sets the least significant operand of this expression.
+     * Sets the left operand of this expression.
      * @param op the operand to set
      */
     template <typename T> requires IsAnyOf<T, LeftT, LogicExpression>
-    bool SetLeftOp(const LeftT& op)
+    bool SetLeftOperand(const T& op)
     {
         if constexpr (std::same_as<LeftT, LogicExpression>) {
             this->left = op.Copy();
@@ -97,11 +114,11 @@ private:
         return false;
     }
     /**
-     * Sets the least significant operand of this expression.
+     * Sets the right operand of this expression.
      * @param op the operand to set
      */
     template <typename T> requires IsAnyOf<T, RightT, LogicExpression>
-    bool SetRightOp(const RightT& op)
+    bool SetRightOperand(const T& op)
     {
         if constexpr (std::same_as<RightT, LogicExpression>) {
             this->right = op.Copy();

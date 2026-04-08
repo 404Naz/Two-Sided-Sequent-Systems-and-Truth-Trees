@@ -20,8 +20,11 @@ public:
     using DerivedGeneralized = DerivedT<LogicExpression>;
     UnaryLogicExpression() = default;
     UnaryLogicExpression(const UnaryLogicExpression& other)
+        : LogicExpression(other)
     {
-        this->operand = other.operand->Copy();
+        if (other.HasOperand()) {
+            SetOperand(other.GetOperand());
+        }
     }
     explicit UnaryLogicExpression(const OpT& op)
     {
@@ -43,19 +46,51 @@ public:
 
         return this->operand->Equals(otherUnaryGeneralized.GetOperand());
     }
+    [[nodiscard]] bool HasOperand() const
+    {
+        return this->operand != nullptr;
+    }
     [[nodiscard]] const OpT& GetOperand() const
     {
         assert (operand != nullptr);
         return *operand;
     }
+    [[nodiscard]] auto Generalize() const -> std::unique_ptr<LogicExpression> final
+    {
+        DerivedGeneralized generalized;
+        if (this->operand) {
+            generalized.SetOperand(*this->operand->Copy());
+        }
+        return std::make_unique<DerivedGeneralized>(generalized);
+    }
+
+    template <typename T> requires IsAnyOf<T, OpT, LogicExpression>
+    bool SetOperand(const T& op)
+    {
+        if constexpr (std::same_as<OpT, LogicExpression>) {
+            this->operand = op.Copy();
+            return true;
+        }
+
+        if constexpr (std::same_as<OpT, T> && !std::same_as<OpT, LogicExpression>) {
+            this->operand = std::make_unique<OpT>(op);
+            return true;
+        }
+
+        if (auto castedOp = RecursiveCast<OpT>(op); castedOp) {
+            operand = std::move(castedOp);
+            return true;
+        }
+        return false;
+    }
+
+    [[nodiscard]] std::string Serialize() const override
+    {
+        return Generalize()->Serialize();
+    }
 
     EXPRESSION_CATEGORY(UnaryExpression)
 private:
-    void SetOperand(const OpT& op)
-    {
-        assert(op != nullptr);
-        this->operand = op;
-    }
     std::unique_ptr<OpT> operand;
 };
 }

@@ -32,7 +32,14 @@ public:
     LogicalConditional(const LogicalConditional& other) :
     BinaryLogicExpression<LogicalConditional, LeftT, RightT>(other) {}
 
+    LogicalConditional(const LeftT& left, const RightT& right) :
+    BinaryLogicExpression<LogicalConditional, LeftT, RightT>(left, right) {}
+
     LogicalConditional& operator=(const LogicalConditional& other) = default;
+    [[nodiscard]] std::string Serialize() const override
+    {
+        return std::format("({} → {})", this->GetLeftOperand()->Serialize(), this->GetRightOperand()->Serialize());
+    }
 
     EXPRESSION_TYPE(Conditional);
     EXPRESSION_CATEGORY(BinaryExpression);

@@ -32,7 +32,14 @@ public:
     LogicalAnd(const LogicalAnd& other) :
     BinaryLogicExpression<LogicalAnd, LeftT, RightT>(other) {}
 
+    LogicalAnd(const LeftT& left, const RightT& right) :
+    BinaryLogicExpression<LogicalAnd, LeftT, RightT>(left, right) {}
+
     LogicalAnd& operator=(const LogicalAnd& other) = default;
+    [[nodiscard]] std::string Serialize() const override
+    {
+        return std::format("({} ∧ {})", this->GetLeftOperand().Serialize(), this->GetRightOperand().Serialize());
+    }
 
     EXPRESSION_TYPE(And);
     EXPRESSION_CATEGORY(BinaryExpression);

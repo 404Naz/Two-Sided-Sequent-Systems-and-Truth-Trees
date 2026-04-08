@@ -14,5 +14,8 @@ bool LogicalAtom::Equals(const LogicExpression& other) const
 {
     return other.Is<LogicalAtom>() && representation == dynamic_cast<const LogicalAtom&>(other).representation;
 }
-
+std::string LogicalAtom::Serialize() const
+{
+    return representation;
+}
 }
