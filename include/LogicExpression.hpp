@@ -5,6 +5,8 @@
 #ifndef SEQUENTSYSTEMSTOTRUTHTREES_LOGICEXPRESSION_HPP
 #define SEQUENTSYSTEMSTOTRUTHTREES_LOGICEXPRESSION_HPP
 #include <memory>
+#include <string>
+#include <format>
 #include "Concepts.hpp"
 
 namespace Logic_Project {
@@ -78,11 +80,17 @@ public:
      * @tparam T The type to check against.
      * @return true if this expression is of type T, false otherwise.
      */
-    template <class T>
+    template <IExpression T>
     [[nodiscard]] bool Is() const
     {
         return GetType() == T::GetStaticType();
     }
+
+    /**
+     * Serializes this into a string for printing/exporting
+     * @return Representation serialized as a string
+     */
+    [[nodiscard]] virtual std::string Serialize() const = 0;
 
     #define EXPRESSION_TYPE(type)                   \
     auto GetType() const -> ExpressionType override \

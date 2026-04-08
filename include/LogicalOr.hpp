@@ -32,7 +32,14 @@ public:
     LogicalOr(const LogicalOr& other) :
     BinaryLogicExpression<LogicalOr, LeftT, RightT>(other) {}
 
+    LogicalOr(const LeftT& left, const RightT& right) :
+    BinaryLogicExpression<LogicalOr, LeftT, RightT>(left, right) {}
+
     LogicalOr& operator=(const LogicalOr& other) = default;
+    [[nodiscard]] std::string Serialize() const override
+    {
+        return std::format("({} ∨ {})", this->GetLeftOperand().Serialize(), this->GetRightOperand().Serialize());
+    }
 
     EXPRESSION_TYPE(Or);
     EXPRESSION_CATEGORY(BinaryExpression);

@@ -7,28 +7,36 @@
 
 namespace Logic_Project {
 
-BinaryTreeNode::BinaryTreeNode(const LogicExpression& statement, const TreeNode& parent, const TreeNode& left, const TreeNode& right)
+BinaryTreeNode::BinaryTreeNode(const LogicExpression& statement, TreeNode& parent, std::unique_ptr<TreeNode> left, std::unique_ptr<TreeNode> right)
 {
     this->statement = statement.Copy();
-    this->parent = parent.Copy();
-    SetLeftChild(left);
-    SetRightChild(right);
+    this->parent = &parent;
+    SetLeftChild(std::move(left));
+    SetRightChild(std::move(right));
+    this->decomposition1 = 0;
+    this->isPremise = false;
 }
 
 BinaryTreeNode::BinaryTreeNode(const LogicExpression& statement)
 {
     this->statement = statement.Copy();
+    this->decomposition1 = 0;
+    this->isPremise = false;
 }
 
-BinaryTreeNode::BinaryTreeNode(const TreeNode& parent)
+BinaryTreeNode::BinaryTreeNode(TreeNode& parent)
 {
     SetParent(parent);
+    this->decomposition1 = 0;
+    this->isPremise = false;
 }
 
-BinaryTreeNode::BinaryTreeNode(const LogicExpression& statement, const TreeNode& parent)
+BinaryTreeNode::BinaryTreeNode(const LogicExpression& statement, TreeNode& parent)
 {
     this->statement = statement.Copy();
     SetParent(parent);
+    this->decomposition1 = 0;
+    this->isPremise = false;
 }
 bool BinaryTreeNode::HasLeftChild() const
 {
@@ -40,22 +48,25 @@ bool BinaryTreeNode::HasRightChild() const
     return this->right != nullptr;
 }
 
-void BinaryTreeNode::SetLeftChild(const TreeNode& leftChild)
+void BinaryTreeNode::SetLeftChild(std::unique_ptr<TreeNode> leftChild)
 {
-    this->left = leftChild.Copy();
+    this->left = std::move(leftChild);
+    if (this->left != nullptr) this->left->SetParent(*this);
 }
-void BinaryTreeNode::SetRightChild(const TreeNode& rightChild)
+void BinaryTreeNode::SetRightChild(std::unique_ptr<TreeNode> rightChild)
 {
-    this->right = rightChild.Copy();
+    this->right = std::move(rightChild);
+    if (this->right != nullptr) this->right->SetParent(*this);
 }
 
 BinaryTreeNode::BinaryTreeNode(const BinaryTreeNode& other)
  : TreeNode(other)
 {
-    SetLeftChild(*other.left);
-    SetRightChild(*other.right);
-    SetParent(*other.parent);
+    if (other.left) SetLeftChild(other.left->Copy());
+    if (other.right) SetRightChild(other.right->Copy());
     this->statement = other.statement->Copy();
+    this->decomposition1 = 0;
+    this->isPremise = false;
 }
 
 std::any BinaryTreeNode::Accept(TreeVisitor& visitor) const

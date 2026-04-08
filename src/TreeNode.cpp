@@ -9,15 +9,17 @@ int TreeNode::globalId = 0;
 
 TreeNode::TreeNode()
 {
-     id = ++globalId;
+    id = ++globalId;
+    parent = nullptr;
 }
 TreeNode::TreeNode(const TreeNode& node)
 {
-     id = ++globalId;
+    id = ++globalId;
+    parent = nullptr;
 }
-void TreeNode::SetParent(const TreeNode& node)
+void TreeNode::SetParent(TreeNode& node)
 {
-     this->parent = node.Copy();
+     this->parent = &node;
 }
 bool TreeNode::HasParent() const
 {

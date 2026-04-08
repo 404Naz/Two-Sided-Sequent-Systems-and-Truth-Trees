@@ -12,18 +12,20 @@ class UnaryTreeNode final : public TreeNode {
     UnaryTreeNode() = default;
     UnaryTreeNode(const UnaryTreeNode& other);
     explicit UnaryTreeNode(const LogicExpression& statement);
-    UnaryTreeNode(const LogicExpression& statement, const TreeNode& parent);
-    UnaryTreeNode(const LogicExpression& statement, const TreeNode& parent, const TreeNode& child);
+    UnaryTreeNode(const LogicExpression& statement, TreeNode& parent);
+    UnaryTreeNode(const LogicExpression& statement, TreeNode& parent, std::unique_ptr<TreeNode> child);
 
     std::any Accept(TreeVisitor& visitor) const override;
     [[nodiscard]] std::unique_ptr<TreeNode> Copy() const override;
 
     [[nodiscard]] bool HasChild() const;
-    void SetChild(const TreeNode& newChild);
+    void SetChild(std::unique_ptr<TreeNode> newChild);
 
     // Statement represented by this node
     std::unique_ptr<LogicExpression> statement;
     std::unique_ptr<TreeNode> child;
+    int decomposition1{};
+    bool isPremise{};
 };
 }
 

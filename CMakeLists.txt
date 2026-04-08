@@ -32,6 +32,7 @@ add_library(project_lib
         src/ClosedTreeNode.cpp
         src/OpenTreeNode.cpp
         src/TreeSerializer.cpp
+        src/UnaryLogicExpression.cpp
 )
 
 target_include_directories(project_lib PUBLIC include)

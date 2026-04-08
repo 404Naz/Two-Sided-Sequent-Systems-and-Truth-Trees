@@ -24,6 +24,8 @@ class LogicalAtom : public LeafLogicExpression<LogicalAtom> {
 
     [[nodiscard]] bool Equals(const LogicExpression& other) const final;
 
+    [[nodiscard]] std::string Serialize() const override;
+
     std::string GetRepresentation();
 
     EXPRESSION_TYPE(Atomic)

@@ -11,7 +11,7 @@
 namespace Logic_Project {
 
 /**
- * An atom (zero place predicate)
+ * Contradition
  */
 class LogicalContradiction : public LeafLogicExpression<LogicalContradiction> {
     public:
@@ -22,6 +22,8 @@ class LogicalContradiction : public LeafLogicExpression<LogicalContradiction> {
     {
         return other.Is<LogicalContradiction>();
     }
+
+    [[nodiscard]] std::string Serialize() const override;
 
     EXPRESSION_TYPE(Contradiction)
     EXPRESSION_CATEGORY(LeafExpression)
