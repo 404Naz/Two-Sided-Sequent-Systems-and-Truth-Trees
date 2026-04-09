@@ -23,12 +23,10 @@ class TreeNode {
     void SetParent(TreeNode& node);
     [[nodiscard]] bool HasParent() const;
 
-    [[nodiscard]] virtual std::unique_ptr<TreeNode> Copy() const = 0;
-
     [[nodiscard]] int GetId() const;
 
     // Parent pointer to get what it decomposes from
-    TreeNode* parent;
+    TreeNode* parent = nullptr;
 
     protected:
     static int globalId;

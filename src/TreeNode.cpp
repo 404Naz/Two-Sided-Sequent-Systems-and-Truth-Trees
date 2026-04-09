@@ -9,12 +9,12 @@ int TreeNode::globalId = 0;
 
 TreeNode::TreeNode()
 {
-    id = ++globalId;
+    id = globalId++;
     parent = nullptr;
 }
 TreeNode::TreeNode(const TreeNode& node)
 {
-    id = ++globalId;
+    id = globalId++;
     parent = nullptr;
 }
 void TreeNode::SetParent(TreeNode& node)

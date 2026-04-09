@@ -15,9 +15,4 @@ std::any OpenTreeNode::Accept(TreeVisitor& visitor) const
     return visitor.Visit(*this);
 }
 
-std::unique_ptr<TreeNode> OpenTreeNode::Copy() const
-{
-    return std::make_unique<OpenTreeNode>();
-}
-
 }

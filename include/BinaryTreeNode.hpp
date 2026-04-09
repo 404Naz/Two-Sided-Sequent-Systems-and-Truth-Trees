@@ -12,15 +12,16 @@ namespace Logic_Project {
 class BinaryTreeNode final : public TreeNode {
     public:
     BinaryTreeNode() = default;
-    BinaryTreeNode(const BinaryTreeNode& other);
+    BinaryTreeNode(const BinaryTreeNode& other) = delete;
+    BinaryTreeNode& operator=(const BinaryTreeNode& other) = delete;
+    BinaryTreeNode(BinaryTreeNode&& other) = default;
+    BinaryTreeNode& operator=(BinaryTreeNode&& other) = default;
     explicit BinaryTreeNode(TreeNode& parent);
     explicit BinaryTreeNode(const LogicExpression& statement);
     BinaryTreeNode(const LogicExpression& statement, TreeNode& parent);
     BinaryTreeNode(const LogicExpression& statement, TreeNode& parent, std::unique_ptr<TreeNode> left, std::unique_ptr<TreeNode> right);
 
     std::any Accept(TreeVisitor& visitor) const override;
-
-    [[nodiscard]] std::unique_ptr<TreeNode> Copy() const override;
 
     [[nodiscard]] bool HasLeftChild() const;
     [[nodiscard]] bool HasRightChild() const;
@@ -31,7 +32,7 @@ class BinaryTreeNode final : public TreeNode {
     std::unique_ptr<LogicExpression> statement;
     std::unique_ptr<TreeNode> left;
     std::unique_ptr<TreeNode> right;
-    int decomposition1{};
+    int antecedent{};
     bool isPremise{};
 };
 
