@@ -17,9 +17,4 @@ std::any ClosedTreeNode::Accept(TreeVisitor& visitor) const
      return visitor.Visit(*this);
 }
 
-std::unique_ptr<TreeNode> ClosedTreeNode::Copy() const
-{
-     return std::make_unique<ClosedTreeNode>();
-}
-
 }

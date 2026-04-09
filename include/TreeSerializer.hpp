@@ -18,7 +18,8 @@ class TreeSerializer final : public TreeVisitor {
     public:
     TreeSerializer() = default;
 
-    std::string Serialize();
+    [[nodiscard]] std::string Serialize() const;
+    [[nodiscard]] std::string SerializeNodes() const;
     [[nodiscard]] std::string Serialize(const TreeNode& root);
 
     std::any Visit(const UnaryTreeNode& node) override;

@@ -13,21 +13,21 @@ BinaryTreeNode::BinaryTreeNode(const LogicExpression& statement, TreeNode& paren
     this->parent = &parent;
     SetLeftChild(std::move(left));
     SetRightChild(std::move(right));
-    this->decomposition1 = 0;
+    this->antecedent = -1;
     this->isPremise = false;
 }
 
 BinaryTreeNode::BinaryTreeNode(const LogicExpression& statement)
 {
     this->statement = statement.Copy();
-    this->decomposition1 = 0;
+    this->antecedent = -1;
     this->isPremise = false;
 }
 
 BinaryTreeNode::BinaryTreeNode(TreeNode& parent)
 {
     SetParent(parent);
-    this->decomposition1 = 0;
+    this->antecedent = -1;
     this->isPremise = false;
 }
 
@@ -35,7 +35,7 @@ BinaryTreeNode::BinaryTreeNode(const LogicExpression& statement, TreeNode& paren
 {
     this->statement = statement.Copy();
     SetParent(parent);
-    this->decomposition1 = 0;
+    this->antecedent = -1;
     this->isPremise = false;
 }
 bool BinaryTreeNode::HasLeftChild() const
@@ -59,23 +59,9 @@ void BinaryTreeNode::SetRightChild(std::unique_ptr<TreeNode> rightChild)
     if (this->right != nullptr) this->right->SetParent(*this);
 }
 
-BinaryTreeNode::BinaryTreeNode(const BinaryTreeNode& other)
- : TreeNode(other)
-{
-    if (other.left) SetLeftChild(other.left->Copy());
-    if (other.right) SetRightChild(other.right->Copy());
-    this->statement = other.statement->Copy();
-    this->decomposition1 = 0;
-    this->isPremise = false;
-}
-
 std::any BinaryTreeNode::Accept(TreeVisitor& visitor) const
 {
     return visitor.Visit(*this);
-}
-std::unique_ptr<TreeNode> BinaryTreeNode::Copy() const
-{
-    return std::make_unique<BinaryTreeNode>(*static_cast<const BinaryTreeNode*>(this));
 }
 
 }
