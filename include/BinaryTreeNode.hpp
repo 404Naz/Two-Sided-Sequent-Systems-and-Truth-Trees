@@ -22,18 +22,19 @@ class BinaryTreeNode final : public TreeNode {
     BinaryTreeNode(const LogicExpression& statement, TreeNode& parent, std::unique_ptr<TreeNode> left, std::unique_ptr<TreeNode> right);
 
     std::any Accept(TreeVisitor& visitor) const override;
+    bool AddNode(std::unique_ptr<TreeNode> node) override;
 
     [[nodiscard]] bool HasLeftChild() const;
     [[nodiscard]] bool HasRightChild() const;
     void SetLeftChild(std::unique_ptr<TreeNode> leftChild);
     void SetRightChild(std::unique_ptr<TreeNode> rightChild);
+    std::unique_ptr<LogicExpression> GetStatement() override;
 
     // Statement represented by this node
     std::unique_ptr<LogicExpression> statement;
     std::unique_ptr<TreeNode> left;
     std::unique_ptr<TreeNode> right;
     int antecedent{};
-    bool isPremise{};
 };
 
 }

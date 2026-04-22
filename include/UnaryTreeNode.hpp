@@ -21,13 +21,14 @@ class UnaryTreeNode final : public TreeNode {
     std::any Accept(TreeVisitor& visitor) const override;
 
     [[nodiscard]] bool HasChild() const;
-    void SetChild(const std::unique_ptr<TreeNode> newChild);
+    void SetChild(std::unique_ptr<TreeNode> newChild);
+    bool AddNode(std::unique_ptr<TreeNode> node) override;
+    std::unique_ptr<LogicExpression> GetStatement() override;
 
     // Statement represented by this node
     std::unique_ptr<LogicExpression> statement;
     std::unique_ptr<TreeNode> child;
     int antecedent{};
-    bool isPremise{};
 };
 }
 

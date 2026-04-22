@@ -6,15 +6,22 @@
 #define SEQUENTSYSTEMSTOTRUTHTREES_BINARYSEQUENTNODE_HPP
 
 #include "SequentNode.hpp"
+#include "LogicExpression.hpp"
 
 namespace Logic_Project {
 class BinarySequentNode final: public SequentNode {
 public:
-    BinarySequentNode() = default;
-    BinarySequentNode(const SequentNode& left, const SequentNode& right);
+    BinarySequentNode() = delete;
+    BinarySequentNode(const std::vector<std::unique_ptr<LogicExpression>>& antecedents, const std::vector<std::unique_ptr<LogicExpression>>& succedents);
+    BinarySequentNode(const std::vector<std::unique_ptr<LogicExpression>>& antecedents, const std::vector<std::unique_ptr<LogicExpression>>& succedents, const SequentNodeRule& rule);
 
-    std::unique_ptr<SequentNode> leftParent;
-    std::unique_ptr<SequentNode> rightParent;
+    void SetLeftParent(SequentNode* left);
+    void SetRightParent(SequentNode* right);
+
+    std::any Accept(SequentVisitor& visitor) override;
+
+    SequentNode* leftParent = nullptr;
+    SequentNode* rightParent = nullptr;
 };
 }
 

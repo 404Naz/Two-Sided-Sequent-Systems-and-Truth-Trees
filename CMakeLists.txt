@@ -33,6 +33,10 @@ add_library(project_lib
         src/OpenTreeNode.cpp
         src/TreeSerializer.cpp
         src/UnaryLogicExpression.cpp
+        src/BinarySequentNode.cpp
+        src/SequentNode.cpp
+        src/UnarySequentNode.cpp
+        src/SequentConverter.cpp
 )
 
 target_include_directories(project_lib PUBLIC include)
@@ -47,6 +51,7 @@ add_executable(tests
         tests/LogicalAtomTests.cpp
         tests/TreeNodeTests.cpp
         tests/TreeSerializerTests.cpp
+        tests/SequentNodeTests.cpp
 )
 
 target_link_libraries(SequentSystemsToTruthTrees PRIVATE project_lib)

@@ -4,6 +4,8 @@
 
 #include "ClosedTreeNode.hpp"
 
+#include "LogicalContradiction.hpp"
+
 namespace Logic_Project {
  ClosedTreeNode::ClosedTreeNode()
      : LeafTreeNode()
@@ -15,6 +17,14 @@ namespace Logic_Project {
 std::any ClosedTreeNode::Accept(TreeVisitor& visitor) const
 {
      return visitor.Visit(*this);
+}
+bool ClosedTreeNode::AddNode(std::unique_ptr<TreeNode>)
+{
+     return false;
+}
+std::unique_ptr<LogicExpression> ClosedTreeNode::GetStatement()
+{
+     return LogicalContradiction{}.Generalize();
 }
 
 }

@@ -10,10 +10,15 @@
 namespace Logic_Project {
 class UnarySequentNode final : public SequentNode {
     public:
-    UnarySequentNode() = default;
-    UnarySequentNode(const SequentNode&);
+    UnarySequentNode() = delete;
+    UnarySequentNode(const std::vector<std::unique_ptr<LogicExpression>>& antecedents, const std::vector<std::unique_ptr<LogicExpression>>& succedents);
+    UnarySequentNode(const std::vector<std::unique_ptr<LogicExpression>>& antecedents, const std::vector<std::unique_ptr<LogicExpression>>& succedents, const SequentNodeRule& rule);
 
-    std::unique_ptr<SequentNode> parent;
+    std::any Accept(SequentVisitor& visitor) override;
+
+    void SetParent(SequentNode* p);
+
+    SequentNode* parent = nullptr;
 };
 }
 

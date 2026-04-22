@@ -44,5 +44,16 @@ void UnaryTreeNode::SetChild(std::unique_ptr<TreeNode> newChild)
     this->child = std::move(newChild);
     if (this->child != nullptr) this->child->SetParent(*this);
 }
-
+bool UnaryTreeNode::AddNode(std::unique_ptr<TreeNode> node)
+{
+    if (this->child == nullptr) {
+        this->SetChild(std::move(node));
+        return true;
+    }
+    return false;
+}
+std::unique_ptr<LogicExpression> UnaryTreeNode::GetStatement()
+{
+    return statement->Copy();
+}
 }

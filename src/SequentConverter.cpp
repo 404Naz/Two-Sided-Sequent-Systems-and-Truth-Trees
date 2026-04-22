@@ -1,0 +1,305 @@
+//
+// Created by Andrew Nazareth on 4/2/26.
+//
+
+#include "SequentConverter.hpp"
+
+#include "BinarySequentNode.hpp"
+#include "ClosedTreeNode.hpp"
+#include "UnarySequentNode.hpp"
+
+#include <RecursiveCast.hpp>
+#include <BinaryTreeNode.hpp>
+#include <LogicalAtom.hpp>
+#include <LogicalNot.hpp>
+#include <UnaryTreeNode.hpp>
+#include <iostream>
+#include <ostream>
+
+namespace Logic_Project {
+
+std::any SequentConverter::Visit(const UnarySequentNode& node)
+{
+    std::cout << static_cast<int>(node.rule) << std::endl;
+    int decomposition1=-1;
+    int decomposition2=-1;
+    int parentId = -1;
+    std::unique_ptr<TreeNode> treeNode;
+    std::unique_ptr<LogicExpression> diffP;
+    std::unique_ptr<LogicExpression> diffC;
+    bool foundMatch = false;
+    switch (SequentNodeRule rule = node.rule) {
+    case SequentNodeRule::None:
+        // A => A
+        // Ideally just one thing on the left and one on the right
+        for (auto& eq: node.succedents) {
+            foundMatch = false;
+            for (auto& eq2 : node.antecedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                    diffC = eq2->Copy();
+                    break;
+                }
+            }
+            if (foundMatch) {
+                break;
+            }
+        }
+        if (!foundMatch) {
+            std::cerr<<"Wrong rule for node."<<std::endl;
+            break;
+        }
+
+        treeNode = std::make_unique<ClosedTreeNode>();
+        // search existing nodes for A, ~A statements to set as decomposition, use the second as the parent
+        diffP = LogicalNot{*diffC->Copy()}.Generalize();
+        for (const auto & createdNode : createdNodes) {
+            auto& closed = dynamic_cast<ClosedTreeNode&>(*treeNode);
+            if (createdNode->GetStatement()->Equals(*diffP) || createdNode->GetStatement()->Equals(*diffC)) {
+                if (decomposition1 == -1) {
+                    decomposition1 = createdNode->GetId();
+                    closed.decomposition1 = decomposition1;
+                } else if (decomposition2 == -1) {
+                    decomposition2 = createdNode->GetId();
+                    closed.decomposition2 = decomposition2;
+                }
+            }
+        }
+
+        // set parent as second of the contradicting things
+        for (const auto & createdNode : createdNodes) {
+            if (createdNode->GetId() == decomposition2) {
+                parentId = createdNode->GetId();
+                break;
+            }
+        }
+
+        // push into list
+        createdNodes.emplace_back(std::move(treeNode));
+        createdNodesParentIds.emplace_back(parentId);
+        break;
+    case SequentNodeRule::ConjL:
+        break;
+    case SequentNodeRule::DisjR:
+        break;
+    case SequentNodeRule::ImplR:
+        break;
+    case SequentNodeRule::NegL:
+    case SequentNodeRule::NegR:
+    case SequentNodeRule::WL:
+    case SequentNodeRule::WR:
+    case SequentNodeRule::XL:
+    case SequentNodeRule::XR:
+    case SequentNodeRule::CL:
+    case SequentNodeRule::CR:
+        // these cases should all be ignored in a tree
+        break;
+    default:
+        std::cerr<<"Unknown rule or wrong rule for type of node."<<std::endl;
+        return nullptr;
+    }
+
+    if (node.parent != nullptr && node.rule != SequentNodeRule::None) {
+        node.parent->Accept(*this);
+    }
+    return nullptr;
+}
+std::any SequentConverter::Visit(const BinarySequentNode& node)
+{
+    std::unique_ptr<LogicExpression> diffL;
+    std::unique_ptr<LogicExpression> diffR;
+    std::unique_ptr<LogicExpression> diffP;
+    std::unique_ptr<TreeNode> treeNode;
+    UnaryTreeNode* unary;
+    BinaryTreeNode* binary;
+    int parentId = -1;
+    switch (node.rule) {
+    case SequentNodeRule::ConjR:
+        if (node.child == nullptr) { // last statement, statements are premises
+            for (int i = 0; i < node.antecedents.size(); i++) {
+                treeNode = std::make_unique<UnaryTreeNode>(*(node.antecedents[i]));
+                parentId = -1;
+                if (i > 0) {
+                    parentId = createdNodes.at(i-1)->GetId();
+                }
+                createdNodes.emplace_back(std::move(treeNode));
+                createdNodesParentIds.emplace_back(parentId);
+            }
+            for (auto& statement : createdNodes) {
+                statement->isPremise = true;
+            }
+        }
+        // Find succedent differences
+        // there should only be one difference in each
+        for (auto& eq: node.succedents) {
+            bool foundMatch = false;
+            for (auto& eq2 : node.leftParent->succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            for (auto& eq2 : node.rightParent->succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffP = eq->Copy();
+                break;
+            }
+        }
+
+        for (auto& eq: node.leftParent->succedents) {
+            bool foundMatch = false;
+            for (auto& eq2 : node.succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            for (auto& eq2 : node.rightParent->succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffL = LogicalNot{*eq->Copy()}.Generalize();
+                break;
+            }
+        }
+
+        for (auto& eq: node.rightParent->succedents) {
+            bool foundMatch = false;
+            for (auto& eq2 : node.leftParent->succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            for (auto& eq2 : node.succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffR = LogicalNot{*eq->Copy()}.Generalize();
+                break;
+            }
+        }
+
+        // create nodes, set the parent id (but not the pointer)
+        treeNode = std::make_unique<BinaryTreeNode>(LogicalNot{*diffP});
+        parentId = -1;
+        if (!createdNodes.empty()) {
+            parentId = createdNodes.back()->GetId();
+        }
+        if (node.isRoot) {
+            treeNode->isPremise = true;
+        }
+        // Currently does not allow for stacked binary expressions (ie (A and B) and (C and D))
+        createdNodes.emplace_back(std::move(treeNode));
+        createdNodesParentIds.emplace_back(parentId);
+        treeNode = std::make_unique<UnaryTreeNode>(*diffL);
+        unary = dynamic_cast<UnaryTreeNode*>(treeNode.get());
+        parentId = createdNodes.back()->GetId();
+        unary->antecedent = parentId;
+        createdNodes.emplace_back(std::move(treeNode));
+        createdNodesParentIds.emplace_back(parentId);
+        treeNode = std::make_unique<UnaryTreeNode>(*diffR);
+        unary = dynamic_cast<UnaryTreeNode*>(treeNode.get());
+        unary->antecedent = parentId;
+        createdNodes.emplace_back(std::move(treeNode));
+        createdNodesParentIds.emplace_back(parentId);
+        break;
+    case SequentNodeRule::DisjL:
+        if (node.child == nullptr) {break;}
+        for (auto& eq: node.succedents) {
+            bool foundMatch = false;
+            for (auto& eq2 : node.leftParent->succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            for (auto& eq2 : node.rightParent->succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffP = eq->Copy();
+                break;
+            }
+        }
+
+        for (auto& eq: node.leftParent->antecedents) {
+            bool foundMatch = false;
+            for (auto& eq2 : node.antecedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            for (auto& eq2 : node.rightParent->antecedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffL = LogicalNot{*eq->Copy()}.Generalize();
+                break;
+            }
+        }
+
+        for (auto& eq: node.rightParent->antecedents) {
+            bool foundMatch = false;
+            for (auto& eq2 : node.leftParent->antecedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            for (auto& eq2 : node.antecedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffR = LogicalNot{*eq->Copy()}.Generalize();
+                break;
+            }
+        }
+
+        break;
+    case SequentNodeRule::ImplL:
+        break;
+    default:
+        std::cerr<<"Unknown rule or wrong rule for type of node."<<std::endl;
+        return nullptr;
+    }
+
+    if (node.leftParent != nullptr) {
+        node.leftParent->Accept(*this);
+    }
+    if (node.rightParent != nullptr) {
+        node.rightParent->Accept(*this);
+    }
+    return nullptr;
+}
+std::unique_ptr<TreeNode> SequentConverter::ConvertToTree(SequentNode& node)
+{
+    createdNodes.clear();
+    createdNodesParentIds.clear();
+    node.Accept(*this);
+    for (size_t i = createdNodes.size()-1; i > 0; i--) {
+        int parentId = createdNodesParentIds[i];
+        auto& treeNode = createdNodes[i];
+        size_t j = 0;
+        for (j = i-1; j > 0; j--) {
+            if (createdNodes[j] != nullptr && createdNodes[j]->GetId() == parentId) {
+                break;
+            }
+        }
+        if (bool ret = createdNodes[j]->AddNode(std::move(treeNode)); !ret) {
+            std::cerr<<"Tried to add child to full node."<<std::endl;
+        }
+    }
+
+    return std::move(createdNodes.at(0));
+}
+}

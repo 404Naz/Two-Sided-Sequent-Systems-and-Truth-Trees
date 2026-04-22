@@ -63,5 +63,21 @@ std::any BinaryTreeNode::Accept(TreeVisitor& visitor) const
 {
     return visitor.Visit(*this);
 }
+bool BinaryTreeNode::AddNode(std::unique_ptr<TreeNode> node)
+{
+    if (this->left == nullptr) {
+        this->SetLeftChild(std::move(node));
+        return true;
+    }
+    if (this->left != nullptr && this->right == nullptr) {
+        this->SetRightChild(std::move(node));
+        return true;
+    }
+    return false;
+}
+std::unique_ptr<LogicExpression> BinaryTreeNode::GetStatement()
+{
+    return statement->Copy();
+}
 
 }
