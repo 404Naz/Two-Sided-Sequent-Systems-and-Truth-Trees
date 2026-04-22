@@ -25,8 +25,12 @@ class TreeNode {
 
     [[nodiscard]] int GetId() const;
 
+    virtual bool AddNode(std::unique_ptr<TreeNode> node) = 0;
+    virtual std::unique_ptr<LogicExpression> GetStatement() = 0;
+
     // Parent pointer to get what it decomposes from
     TreeNode* parent = nullptr;
+    bool isPremise{};
 
     protected:
     static int globalId;

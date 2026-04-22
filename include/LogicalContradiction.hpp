@@ -15,7 +15,7 @@ namespace Logic_Project {
  */
 class LogicalContradiction : public LeafLogicExpression<LogicalContradiction> {
     public:
-    LogicalContradiction() = delete;
+    LogicalContradiction() = default;
     LogicalContradiction(const LogicalContradiction &) = default;
 
     [[nodiscard]] bool Equals(const LogicExpression& other) const final

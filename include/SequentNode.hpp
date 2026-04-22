@@ -6,11 +6,14 @@
 #define SEQUENTSYSTEMSTOTRUTHTREES_SEQUENTNODE_HPP
 #include "LogicExpression.hpp"
 
+#include <SequentVisitor.hpp>
+#include <any>
 #include <vector>
 
 namespace Logic_Project {
 
 enum class SequentNodeRule {
+    None,
     NegL,
     NegR,
     ConjL,
@@ -30,11 +33,15 @@ enum class SequentNodeRule {
 class SequentNode {
     public:
     SequentNode() = default;
+    virtual ~SequentNode() = default;
 
-    SequentNodeRule rule;
+    virtual std::any Accept(SequentVisitor& visitor) = 0;
+
+    SequentNodeRule rule = SequentNodeRule::None;
     std::vector<std::unique_ptr<LogicExpression>> antecedents;
     std::vector<std::unique_ptr<LogicExpression>> succedents;
-    std::unique_ptr<SequentNode> child;
+    SequentNode* child = nullptr;
+    bool isRoot = false;
 };
 }
 

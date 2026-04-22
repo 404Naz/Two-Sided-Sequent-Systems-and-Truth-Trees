@@ -10,7 +10,9 @@ class OpenTreeNode final : public LeafTreeNode {
     public:
     OpenTreeNode();
 
+    bool AddNode(std::unique_ptr<TreeNode> node) override;
     std::any Accept(TreeVisitor& visitor) const override;
+    std::unique_ptr<LogicExpression> GetStatement() override;
 };
 }
 

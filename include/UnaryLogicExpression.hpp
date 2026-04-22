@@ -5,6 +5,7 @@
 #ifndef SEQUENTSYSTEMSTOTRUTHTREES_UNARYLOGICEXPRESSION_HPP
 #define SEQUENTSYSTEMSTOTRUTHTREES_UNARYLOGICEXPRESSION_HPP
 #include "LogicExpression.hpp"
+#include "RecursiveCast.hpp"
 #include <cassert>
 
 namespace Logic_Project {

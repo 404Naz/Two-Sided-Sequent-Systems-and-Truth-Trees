@@ -14,5 +14,13 @@ std::any OpenTreeNode::Accept(TreeVisitor& visitor) const
 {
     return visitor.Visit(*this);
 }
+bool OpenTreeNode::AddNode(std::unique_ptr<TreeNode>)
+{
+    return false;
+}
+std::unique_ptr<LogicExpression> OpenTreeNode::GetStatement()
+{
+    return nullptr;
+}
 
 }

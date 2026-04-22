@@ -17,6 +17,8 @@ class LogicalNot<LogicExpression> : public UnaryLogicExpression<LogicalNot> {
 public:
     using UnaryLogicExpression::UnaryLogicExpression;
 
+    [[nodiscard]] std::string Serialize() const override;
+
     EXPRESSION_TYPE(Not);
     EXPRESSION_CATEGORY(UnaryExpression);
 };
@@ -29,10 +31,6 @@ class LogicalNot final : public UnaryLogicExpression<LogicalNot, OperandT> {
     explicit LogicalNot(const OperandT& op) : UnaryLogicExpression<LogicalNot, OperandT>(op) {}
 
     LogicalNot& operator=(const LogicalNot& other) = default;
-    [[nodiscard]] std::string Serialize() const override
-    {
-        return std::format("¬{}", this->GetOperand().Serialize());
-    }
 
     EXPRESSION_TYPE(Not)
     EXPRESSION_CATEGORY(UnaryExpression)

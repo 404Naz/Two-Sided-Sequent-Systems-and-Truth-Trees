@@ -6,8 +6,6 @@
 #define SEQUENTSYSTEMSTOTRUTHTREES_RECURSIVECAST_HPP
 
 #include "LogicExpression.hpp"
-#include "BinaryLogicExpression.hpp"
-#include "UnaryLogicExpression.hpp"
 
 // Code taken from OASIS
 
