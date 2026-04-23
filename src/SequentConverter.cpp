@@ -109,15 +109,18 @@ std::any SequentConverter::Visit(const BinarySequentNode& node)
     std::unique_ptr<LogicExpression> diffL;
     std::unique_ptr<LogicExpression> diffR;
     std::unique_ptr<LogicExpression> diffP;
-    std::unique_ptr<TreeNode> treeNode;
+    std::unique_ptr<BinaryTreeNode> treeNodeP;
+    std::unique_ptr<UnaryTreeNode> treeNodeL;
+    std::unique_ptr<UnaryTreeNode> treeNodeR;
     UnaryTreeNode* unary;
     BinaryTreeNode* binary;
     int parentId = -1;
     switch (node.rule) {
     case SequentNodeRule::ConjR:
-        if (node.child == nullptr) { // last statement, statements are premises
+        if (node.child == nullptr) {
+            // last statement, statements are premises
             for (int i = 0; i < node.antecedents.size(); i++) {
-                treeNode = std::make_unique<UnaryTreeNode>(*(node.antecedents[i]));
+                std::unique_ptr<TreeNode> treeNode = std::make_unique<UnaryTreeNode>(*(node.antecedents[i]));
                 parentId = -1;
                 if (i > 0) {
                     parentId = createdNodes.at(i-1)->GetId();
@@ -186,27 +189,27 @@ std::any SequentConverter::Visit(const BinarySequentNode& node)
         }
 
         // create nodes, set the parent id (but not the pointer)
-        treeNode = std::make_unique<BinaryTreeNode>(LogicalNot{*diffP});
+        treeNodeP = std::make_unique<BinaryTreeNode>(LogicalNot{*diffP});
         parentId = -1;
         if (!createdNodes.empty()) {
             parentId = createdNodes.back()->GetId();
         }
         if (node.isRoot) {
-            treeNode->isPremise = true;
+            treeNodeP->isPremise = true;
         }
         // Currently does not allow for stacked binary expressions (ie (A and B) and (C and D))
-        createdNodes.emplace_back(std::move(treeNode));
         createdNodesParentIds.emplace_back(parentId);
-        treeNode = std::make_unique<UnaryTreeNode>(*diffL);
-        unary = dynamic_cast<UnaryTreeNode*>(treeNode.get());
-        parentId = createdNodes.back()->GetId();
-        unary->antecedent = parentId;
-        createdNodes.emplace_back(std::move(treeNode));
+        treeNodeL = std::make_unique<UnaryTreeNode>(*diffL);
+        parentId = treeNodeP->GetId();
+        treeNodeL->antecedent = parentId;
+        treeNodeR = std::make_unique<UnaryTreeNode>(*diffR);
+        treeNodeR->antecedent = parentId;
+        treeNodeP->decomposition1 = treeNodeL->GetId();
+        treeNodeP->decomposition2 = treeNodeR->GetId();
+        createdNodes.emplace_back(std::move(treeNodeP));
+        createdNodes.emplace_back(std::move(treeNodeL));
+        createdNodes.emplace_back(std::move(treeNodeR));
         createdNodesParentIds.emplace_back(parentId);
-        treeNode = std::make_unique<UnaryTreeNode>(*diffR);
-        unary = dynamic_cast<UnaryTreeNode*>(treeNode.get());
-        unary->antecedent = parentId;
-        createdNodes.emplace_back(std::move(treeNode));
         createdNodesParentIds.emplace_back(parentId);
         break;
     case SequentNodeRule::DisjL:
