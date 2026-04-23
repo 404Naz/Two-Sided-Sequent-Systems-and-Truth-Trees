@@ -124,14 +124,9 @@ TEST_CASE("SequentConversion", "[SequentConverter][TreeNodeSerializer]")
     auto treeRoot = converter.ConvertToTree(BC_BandC);
     REQUIRE(treeRoot != nullptr);
     std::string result = serializer.Serialize(*treeRoot);
-
-    // WRONG PATTERN
-    std::regex pattern {
-        R"aa(\{"nodes":\[\{"id":\d+,"text":"B","children":\[\d+\],"decomposition":\[\],"premise":true\},\{"id":\d+,"text":"¬B","children":\[\d+\],"decomposition":\[\],"parent":\d+,"premise":true\},\{"id":\d+,"text":"×","children":\[\],"decomposition":\[\d+,\d+\],"parent":\d+\}\],"options":\{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false\}\})aa"
-    };
+    std::string expected = R"aa({"nodes":[{"id":0,"text":"B","children":[1],"decomposition":[],"premise":true},{"id":1,"text":"C","children":[2],"decomposition":[],"parent":0,"premise":true},{"id":2,"text":"¬(B ∧ C)","children":[4,3],"decomposition":[3,4],"parent":1,"premise":true},{"id":4,"text":"¬C","children":[6],"decomposition":[],"parent":2,"antecedent":2,"premise":false},{"id":6,"text":"×","children":[],"decomposition":[1,4],"parent":4},{"id":3,"text":"¬B","children":[5],"decomposition":[],"parent":2,"antecedent":2,"premise":false},{"id":5,"text":"×","children":[],"decomposition":[0,3],"parent":3}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
 
     CAPTURE(result);
-    // REQUIRE(std::regex_search(result, pattern));
-    FAIL();
+    REQUIRE(result == expected);
 }
 }
