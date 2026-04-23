@@ -25,8 +25,12 @@ std::any SequentConverter::Visit(const UnarySequentNode& node)
     int decomposition2=-1;
     int parentId = -1;
     std::unique_ptr<TreeNode> treeNode;
+    std::unique_ptr<UnaryTreeNode> treeNodeP;
+    std::unique_ptr<UnaryTreeNode> treeNodeC1;
+    std::unique_ptr<UnaryTreeNode> treeNodeC2;
     std::unique_ptr<LogicExpression> diffP;
     std::unique_ptr<LogicExpression> diffC;
+    std::vector<std::unique_ptr<LogicExpression>> diffsC;
     bool foundMatch = false;
     switch (SequentNodeRule rule = node.rule) {
     case SequentNodeRule::None:
@@ -79,10 +83,174 @@ std::any SequentConverter::Visit(const UnarySequentNode& node)
         createdNodesParentIds.emplace_back(parentId);
         break;
     case SequentNodeRule::ConjL:
+        for (auto& eq: node.antecedents) {
+            foundMatch = false;
+            for (auto& eq2 : node.parent->antecedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffP = eq->Copy();
+                break;
+            }
+        }
+
+        // there should be 2 differences
+        for (auto& eq: node.parent->antecedents) {
+            foundMatch = false;
+            for (auto& eq2 : node.antecedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffsC.push_back(eq->Copy());
+            }
+        }
+
+        treeNodeP = std::make_unique<UnaryTreeNode>(*diffP);
+
+        treeNodeC1 = std::make_unique<UnaryTreeNode>(*diffsC[0]);
+        treeNodeC1->antecedent = treeNodeP->GetId();
+        treeNodeC2 = std::make_unique<UnaryTreeNode>(*diffsC[1]);
+        treeNodeC2->antecedent = treeNodeP->GetId();
+        treeNodeP->decomposition1 = treeNodeC1->GetId();
+        treeNodeP->decomposition2 = treeNodeC2->GetId();
+
+        if (node.child == nullptr) {
+            treeNodeP->isPremise = true;
+        }
+        if (!createdNodes.empty()) {
+            parentId = createdNodes.back()->GetId();
+            createdNodesParentIds.emplace_back(parentId);
+        } else {
+            createdNodesParentIds.emplace_back(-1);
+        }
+
+        createdNodesParentIds.emplace_back(treeNodeP->GetId());
+        createdNodesParentIds.emplace_back(treeNodeC1->GetId());
+        createdNodes.emplace_back(std::move(treeNodeP));
+        createdNodes.emplace_back(std::move(treeNodeC1));
+        createdNodes.emplace_back(std::move(treeNodeC2));
         break;
     case SequentNodeRule::DisjR:
+        for (auto& eq: node.succedents) {
+            foundMatch = false;
+            for (auto& eq2 : node.parent->succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffP = LogicalNot{*eq->Copy()}.Generalize();
+                break;
+            }
+        }
+
+        // there should be 2 differences
+        for (auto& eq: node.parent->succedents) {
+            foundMatch = false;
+            for (auto& eq2 : node.succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffsC.push_back(LogicalNot{*eq->Copy()}.Generalize());
+            }
+        }
+
+        treeNodeP = std::make_unique<UnaryTreeNode>(*diffP);
+
+        treeNodeC1 = std::make_unique<UnaryTreeNode>(*diffsC[0]);
+        treeNodeC1->antecedent = treeNodeP->GetId();
+        treeNodeC2 = std::make_unique<UnaryTreeNode>(*diffsC[1]);
+        treeNodeC2->antecedent = treeNodeP->GetId();
+        treeNodeP->decomposition1 = treeNodeC1->GetId();
+        treeNodeP->decomposition2 = treeNodeC2->GetId();
+
+        if (node.child == nullptr) {
+            treeNodeP->isPremise = true;
+        }
+        if (!createdNodes.empty()) {
+            parentId = createdNodes.back()->GetId();
+            createdNodesParentIds.emplace_back(parentId);
+        } else {
+            createdNodesParentIds.emplace_back(-1);
+        }
+
+        createdNodesParentIds.emplace_back(treeNodeP->GetId());
+        createdNodesParentIds.emplace_back(treeNodeC1->GetId());
+        createdNodes.emplace_back(std::move(treeNodeP));
+        createdNodes.emplace_back(std::move(treeNodeC1));
+        createdNodes.emplace_back(std::move(treeNodeC2));
         break;
     case SequentNodeRule::ImplR:
+        for (auto& eq: node.succedents) {
+            foundMatch = false;
+            for (auto& eq2 : node.parent->succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffP = LogicalNot{*eq->Copy()}.Generalize();
+                break;
+            }
+        }
+
+        // there should be 2 differences, one in each
+        for (auto& eq: node.parent->antecedents) {
+            foundMatch = false;
+            for (auto& eq2 : node.antecedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffsC.push_back(eq->Copy());
+                break;
+            }
+        }
+
+        for (auto& eq: node.parent->succedents) {
+            foundMatch = false;
+            for (auto& eq2 : node.succedents) {
+                if (eq->Equals(*eq2)) {
+                    foundMatch = true;
+                }
+            }
+            if (!foundMatch) {
+                diffsC.push_back(LogicalNot{*eq->Copy()}.Generalize());
+                break;
+            }
+        }
+
+        treeNodeP = std::make_unique<UnaryTreeNode>(*diffP);
+
+        treeNodeC1 = std::make_unique<UnaryTreeNode>(*diffsC[0]);
+        treeNodeC1->antecedent = treeNodeP->GetId();
+        treeNodeC2 = std::make_unique<UnaryTreeNode>(*diffsC[1]);
+        treeNodeC2->antecedent = treeNodeP->GetId();
+        treeNodeP->decomposition1 = treeNodeC1->GetId();
+        treeNodeP->decomposition2 = treeNodeC2->GetId();
+
+        if (node.child == nullptr) {
+            treeNodeP->isPremise = true;
+        }
+        if (!createdNodes.empty()) {
+            parentId = createdNodes.back()->GetId();
+            createdNodesParentIds.emplace_back(parentId);
+        } else {
+            createdNodesParentIds.emplace_back(-1);
+        }
+
+        createdNodesParentIds.emplace_back(treeNodeP->GetId());
+        createdNodesParentIds.emplace_back(treeNodeC1->GetId());
+        createdNodes.emplace_back(std::move(treeNodeP));
+        createdNodes.emplace_back(std::move(treeNodeC1));
+        createdNodes.emplace_back(std::move(treeNodeC2));
         break;
     case SequentNodeRule::NegL:
     case SequentNodeRule::NegR:

@@ -29,6 +29,8 @@ class UnaryTreeNode final : public TreeNode {
     std::unique_ptr<LogicExpression> statement;
     std::unique_ptr<TreeNode> child;
     int antecedent{};
+    int decomposition1 = -1;
+    int decomposition2 = -1;
 };
 }
 

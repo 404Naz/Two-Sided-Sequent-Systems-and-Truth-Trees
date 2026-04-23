@@ -38,7 +38,7 @@ public:
     LogicalConditional& operator=(const LogicalConditional& other) = default;
     [[nodiscard]] std::string Serialize() const override
     {
-        return std::format("({} → {})", this->GetLeftOperand()->Serialize(), this->GetRightOperand()->Serialize());
+        return std::format("({} → {})", this->GetLeftOperand().Serialize(), this->GetRightOperand().Serialize());
     }
 
     EXPRESSION_TYPE(Conditional);
