@@ -20,6 +20,11 @@ class LogicalConditional<
 public:
     using BinaryLogicExpression::BinaryLogicExpression;
 
+    [[nodiscard]] std::string Serialize() const override
+    {
+        return std::format("({} → {})", this->GetLeftOperand().Serialize(), this->GetRightOperand().Serialize());
+    }
+
     EXPRESSION_TYPE(Conditional);
     EXPRESSION_CATEGORY(BinaryExpression);
 };

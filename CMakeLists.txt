@@ -52,6 +52,8 @@ add_executable(tests
         tests/TreeNodeTests.cpp
         tests/TreeSerializerTests.cpp
         tests/SequentNodeTests.cpp
+        tests/TreeAndConversionTests.cpp
+        tests/LogicExpressionTests.cpp
 )
 
 target_link_libraries(SequentSystemsToTruthTrees PRIVATE project_lib)
