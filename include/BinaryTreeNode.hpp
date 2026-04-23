@@ -35,6 +35,8 @@ class BinaryTreeNode final : public TreeNode {
     std::unique_ptr<TreeNode> left;
     std::unique_ptr<TreeNode> right;
     int antecedent{};
+    int decomposition1 = -1;
+    int decomposition2 = -1;
 };
 
 }
