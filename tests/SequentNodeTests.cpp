@@ -10,6 +10,7 @@
 #include "LogicalNot.hpp"
 #include "LogicalAnd.hpp"
 #include "LogicalOr.hpp"
+#include "LogicalConditional.hpp"
 #include "SequentConverter.hpp"
 #include "TreeSerializer.hpp"
 
@@ -67,7 +68,7 @@ TEST_CASE("SequentTreeBuilding", "[BinarySequentNode][UnarySequentNode]")
     REQUIRE(C_C.child == &BC_C);
 }
 
-TEST_CASE("SequentConversion", "[SequentConverter][TreeNodeSerializer]")
+TEST_CASE("SequentConversion - None and ConjR", "[SequentConverter][TreeNodeSerializer]")
 {
     std::vector<std::unique_ptr<LogicExpression>> antecedent = {};
     antecedent.emplace_back(LogicalAtom{"B"}.Generalize());
@@ -129,4 +130,92 @@ TEST_CASE("SequentConversion", "[SequentConverter][TreeNodeSerializer]")
     CAPTURE(result);
     REQUIRE(result == expected);
 }
+
+TEST_CASE("SequentConversion - ConjL", "[SequentConverter][TreeNodeSerializer]")
+{
+    std::vector<std::unique_ptr<LogicExpression>> antecedent = {};
+    antecedent.emplace_back(LogicalAnd { LogicalAtom { "A" }, LogicalAtom { "B" } }.Generalize());
+    std::vector<std::unique_ptr<LogicExpression>> succedent = {};
+    UnarySequentNode AandB_ { antecedent, succedent };
+    AandB_.rule = SequentNodeRule::ConjL;
+
+    antecedent.clear();
+    antecedent.emplace_back(LogicalAtom { "A" }.Generalize());
+    antecedent.emplace_back(LogicalAtom { "B" }.Generalize());
+    UnarySequentNode AB_ { antecedent, succedent };
+    // ignore the "Wrong rule for node" error message. I did not set the proper rule (i did not make the rest of the tree)
+
+    AandB_.SetParent(&AB_);
+    REQUIRE(AB_.child == &AandB_);
+
+    // Convert to tree
+    SequentConverter converter {};
+    TreeSerializer serializer {};
+    auto treeRoot = converter.ConvertToTree(AandB_);
+    REQUIRE(treeRoot != nullptr);
+    std::string result = serializer.Serialize(*treeRoot);
+    std::string expected = R"aa({"nodes":[{"id":0,"text":"(A ∧ B)","children":[1],"decomposition":[1,2],"premise":true},{"id":1,"text":"A","children":[2],"decomposition":[],"parent":0,"antecedent":0,"premise":false},{"id":2,"text":"B","children":[],"decomposition":[],"parent":1,"antecedent":0,"premise":false}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
+
+    CAPTURE(result);
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("SequentConversion - DisjR", "[SequentConverter][TreeNodeSerializer]")
+{
+    std::vector<std::unique_ptr<LogicExpression>> succedent = {};
+    succedent.emplace_back(LogicalAnd { LogicalAtom { "A" }, LogicalAtom { "B" } }.Generalize());
+    std::vector<std::unique_ptr<LogicExpression>> antecedent = {};
+    UnarySequentNode AorB { antecedent, succedent };
+    AorB.rule = SequentNodeRule::DisjR;
+
+    succedent.clear();
+    succedent.emplace_back(LogicalAtom { "A" }.Generalize());
+    succedent.emplace_back(LogicalAtom { "B" }.Generalize());
+    UnarySequentNode AB { antecedent, succedent };
+    // ignore the "Wrong rule for node" error message. I did not set the proper rule (i did not make the rest of the tree)
+
+    AorB.SetParent(&AB);
+    REQUIRE(AB.child == &AorB);
+
+    // Convert to tree
+    SequentConverter converter {};
+    TreeSerializer serializer {};
+    auto treeRoot = converter.ConvertToTree(AorB);
+    REQUIRE(treeRoot != nullptr);
+    std::string result = serializer.Serialize(*treeRoot);
+    std::string expected = R"aa({"nodes":[{"id":0,"text":"¬(A ∧ B)","children":[1],"decomposition":[1,2],"premise":true},{"id":1,"text":"¬A","children":[2],"decomposition":[],"parent":0,"antecedent":0,"premise":false},{"id":2,"text":"¬B","children":[],"decomposition":[],"parent":1,"antecedent":0,"premise":false}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
+
+    CAPTURE(result);
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("SequentConversion - ImplR", "[SequentConverter][TreeNodeSerializer]")
+{
+    std::vector<std::unique_ptr<LogicExpression>> succedent = {};
+    succedent.emplace_back(LogicalConditional { LogicalAtom { "A" }, LogicalAtom { "B" } }.Generalize());
+    std::vector<std::unique_ptr<LogicExpression>> antecedent = {};
+    UnarySequentNode AtoB { antecedent, succedent };
+    AtoB.rule = SequentNodeRule::ImplR;
+
+    succedent.clear();
+    antecedent.emplace_back(LogicalAtom { "A" }.Generalize());
+    succedent.emplace_back(LogicalAtom { "B" }.Generalize());
+    UnarySequentNode A_B { antecedent, succedent };
+    // ignore the "Wrong rule for node" error message. I did not set the proper rule (i did not make the rest of the tree)
+
+    AtoB.SetParent(&A_B);
+    REQUIRE(A_B.child == &AtoB);
+
+    // Convert to tree
+    SequentConverter converter {};
+    TreeSerializer serializer {};
+    auto treeRoot = converter.ConvertToTree(AtoB);
+    REQUIRE(treeRoot != nullptr);
+    std::string result = serializer.Serialize(*treeRoot);
+    std::string expected = R"aa({"nodes":[{"id":0,"text":"¬(A → B)","children":[1],"decomposition":[1,2],"premise":true},{"id":1,"text":"A","children":[2],"decomposition":[],"parent":0,"antecedent":0,"premise":false},{"id":2,"text":"¬B","children":[],"decomposition":[],"parent":1,"antecedent":0,"premise":false}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
+
+    CAPTURE(result);
+    REQUIRE(result == expected);
+}
+
 }

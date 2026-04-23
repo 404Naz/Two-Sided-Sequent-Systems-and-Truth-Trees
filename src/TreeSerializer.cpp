@@ -15,9 +15,12 @@ namespace Logic_Project {
 
 std::any TreeSerializer::Visit(const UnaryTreeNode& node)
 {
-    std::string childText, parentText, antecedentText;
+    std::string childText, decompositionText, parentText, antecedentText;
     if (node.antecedent >= 0) {
         antecedentText = std::format(R"("antecedent":{},)", node.antecedent);
+    }
+    if (node.decomposition1 >= 0 && node.decomposition2 >= 0) {
+        decompositionText = std::format(R"({},{})", node.decomposition1, node.decomposition2);
     }
     if (node.HasChild())
     {
@@ -27,8 +30,8 @@ std::any TreeSerializer::Visit(const UnaryTreeNode& node)
         parentText = std::format(R"("parent":{},)", node.parent->GetId());
     }
 
-    std::string decomposition = std::format(R"("id":{},"text":"{}","children":[{}],"decomposition":[],{}{}"premise":{})", \
-            node.GetId(), node.statement->Serialize(), childText, parentText, antecedentText, node.isPremise);
+    std::string decomposition = std::format(R"("id":{},"text":"{}","children":[{}],"decomposition":[{}],{}{}"premise":{})", \
+            node.GetId(), node.statement->Serialize(), childText, decompositionText, parentText, antecedentText, node.isPremise);
 
     serializedNodes.push_back("{"+decomposition+"}");
 
