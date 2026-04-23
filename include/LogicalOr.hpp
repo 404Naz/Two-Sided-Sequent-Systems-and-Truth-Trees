@@ -20,6 +20,11 @@ class LogicalOr<
 public:
     using BinaryLogicExpression::BinaryLogicExpression;
 
+    [[nodiscard]] std::string Serialize() const override
+    {
+        return std::format("({} ∨ {})", this->GetLeftOperand().Serialize(), this->GetRightOperand().Serialize());
+    }
+
     EXPRESSION_TYPE(Or);
     EXPRESSION_CATEGORY(BinaryExpression);
 };

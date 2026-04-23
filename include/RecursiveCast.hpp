@@ -30,22 +30,23 @@ auto RecursiveCast(const LogicExpression& other) -> std::unique_ptr<T>
         const std::unique_ptr<LogicExpression> otherGeneralized = other.Generalize();
         const auto& otherBinaryExpression = static_cast<const DerivedT<LogicExpression, LogicExpression>&>(*otherGeneralized);
 
-        auto specializedMostSigOp = RecursiveCast<MostSigOpT>(otherBinaryExpression.GetMostSigOp());
-        auto specializedLeastSigOp = RecursiveCast<LeastSigOpT>(otherBinaryExpression.GetLeastSigOp());
+        auto specializedMostSigOp = RecursiveCast<MostSigOpT>(otherBinaryExpression.GetLeftOperand());
+        auto specializedLeastSigOp = RecursiveCast<LeastSigOpT>(otherBinaryExpression.GetRightOperand());
 
         if (specializedMostSigOp && specializedLeastSigOp) {
             return std::make_unique<T>(*specializedMostSigOp, *specializedLeastSigOp);
         }
 
-        auto otherWithSwappedOps
-            = otherBinaryExpression.SwapOperands();
-
-        specializedMostSigOp = RecursiveCast<MostSigOpT>(otherWithSwappedOps.GetMostSigOp());
-        specializedLeastSigOp = RecursiveCast<LeastSigOpT>(otherWithSwappedOps.GetLeastSigOp());
-
-        if (specializedMostSigOp && specializedLeastSigOp) {
-            return std::make_unique<T>(*specializedMostSigOp, *specializedLeastSigOp);
-        }
+        // TODO: See if its worth implementing SwapOperands
+        // auto otherWithSwappedOps
+        //     = otherBinaryExpression.SwapOperands();
+        //
+        // specializedMostSigOp = RecursiveCast<MostSigOpT>(otherWithSwappedOps.GetLeftOperand());
+        // specializedLeastSigOp = RecursiveCast<LeastSigOpT>(otherWithSwappedOps.GetRightOperand());
+        //
+        // if (specializedMostSigOp && specializedLeastSigOp) {
+        //     return std::make_unique<T>(*specializedMostSigOp, *specializedLeastSigOp);
+        // }
 
         return nullptr;
     }(dummy);

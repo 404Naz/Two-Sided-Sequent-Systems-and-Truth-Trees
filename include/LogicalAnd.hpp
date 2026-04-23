@@ -20,6 +20,11 @@ class LogicalAnd<
 public:
     using BinaryLogicExpression::BinaryLogicExpression;
 
+    [[nodiscard]] std::string Serialize() const override
+    {
+        return std::format("({} ∧ {})", this->GetLeftOperand().Serialize(), this->GetRightOperand().Serialize());
+    }
+
     EXPRESSION_TYPE(And);
     EXPRESSION_CATEGORY(BinaryExpression);
 };
