@@ -14,7 +14,7 @@ class UnarySequentNode final : public SequentNode {
     UnarySequentNode(const std::vector<std::unique_ptr<LogicExpression>>& antecedents, const std::vector<std::unique_ptr<LogicExpression>>& succedents);
     UnarySequentNode(const std::vector<std::unique_ptr<LogicExpression>>& antecedents, const std::vector<std::unique_ptr<LogicExpression>>& succedents, const SequentNodeRule& rule);
 
-    std::any Accept(SequentVisitor& visitor) override;
+    std::unique_ptr<TreeNode> Accept(SequentVisitor& visitor) override;
 
     void SetParent(SequentNode* p);
 

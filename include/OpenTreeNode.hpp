@@ -13,6 +13,10 @@ class OpenTreeNode final : public LeafTreeNode {
     bool AddNode(std::unique_ptr<TreeNode> node) override;
     std::any Accept(TreeVisitor& visitor) const override;
     std::unique_ptr<LogicExpression> GetStatement() override;
+    bool SetAntecedent(int id) override
+    {
+        return false;
+    }
 };
 }
 

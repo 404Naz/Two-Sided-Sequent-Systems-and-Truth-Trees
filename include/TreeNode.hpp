@@ -27,6 +27,7 @@ class TreeNode {
 
     virtual bool AddNode(std::unique_ptr<TreeNode> node) = 0;
     virtual std::unique_ptr<LogicExpression> GetStatement() = 0;
+    virtual bool SetAntecedent(int id) = 0;
 
     // Parent pointer to get what it decomposes from
     TreeNode* parent = nullptr;

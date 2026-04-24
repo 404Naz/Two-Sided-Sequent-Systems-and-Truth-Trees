@@ -23,6 +23,11 @@ class BinaryTreeNode final : public TreeNode {
 
     std::any Accept(TreeVisitor& visitor) const override;
     bool AddNode(std::unique_ptr<TreeNode> node) override;
+    bool SetAntecedent(const int id) override
+    {
+        antecedent = id;
+        return true;
+    }
 
     [[nodiscard]] bool HasLeftChild() const;
     [[nodiscard]] bool HasRightChild() const;

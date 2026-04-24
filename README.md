@@ -90,7 +90,7 @@ Quick reference for how sequent rules map to tree shapes:
 
 ## What's done and what's not
 
-Done: expression AST, tree nodes, serializer, visitor infrastructure, sequent node types, tests.
+Done: expression AST, tree nodes, serializer, visitor infrastructure, sequent node types, some unit tests.
 
 Still needs work: the actual conversion algorithm between sequent proofs and truth trees, a parser for input, and the truth tree rules section of the paper.
 

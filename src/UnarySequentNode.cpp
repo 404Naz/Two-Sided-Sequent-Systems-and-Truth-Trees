@@ -32,7 +32,7 @@ void UnarySequentNode::SetParent(SequentNode* p)
         this->parent->child = this;
     }
 }
-std::any UnarySequentNode::Accept(SequentVisitor& visitor)
+std::unique_ptr<TreeNode> UnarySequentNode::Accept(SequentVisitor& visitor)
 {
     return visitor.Visit(*this);
 }

@@ -41,7 +41,7 @@ void BinarySequentNode::SetRightParent(SequentNode* right)
         this->rightParent->child = this;
     }
 }
-std::any BinarySequentNode::Accept(SequentVisitor& visitor)
+std::unique_ptr<TreeNode> BinarySequentNode::Accept(SequentVisitor& visitor)
 {
     return visitor.Visit(*this);
 }

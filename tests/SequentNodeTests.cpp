@@ -68,6 +68,26 @@ TEST_CASE("SequentTreeBuilding", "[BinarySequentNode][UnarySequentNode]")
     REQUIRE(C_C.child == &BC_C);
 }
 
+TEST_CASE("SequentConversion - None", "[SequentConverter][TreeNodeSerializer]")
+{
+    std::vector<std::unique_ptr<LogicExpression>> antecedent = {};
+    antecedent.emplace_back(LogicalAtom{"B"}.Generalize());
+    std::vector<std::unique_ptr<LogicExpression>> succedent = {};
+    succedent.emplace_back(LogicalAtom{"B"}.Generalize());
+    UnarySequentNode B_B {antecedent, succedent};
+    B_B.rule = SequentNodeRule::None;
+
+    SequentConverter converter{};
+    TreeSerializer serializer{};
+    auto treeRoot = converter.ConvertToTree(B_B);
+    REQUIRE(treeRoot != nullptr);
+    std::string result = serializer.Serialize(*treeRoot);
+    std::string expected = R"aa({"nodes":[{"id":1,"text":"¬B","children":[0],"decomposition":[],"premise":true},{"id":0,"text":"B","children":[2],"decomposition":[],"parent":1,"premise":true},{"id":2,"text":"×","children":[],"decomposition":[0,1],"parent":0}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
+
+    CAPTURE(result);
+    REQUIRE(result == expected);
+}
+
 TEST_CASE("SequentConversion - None and ConjR", "[SequentConverter][TreeNodeSerializer]")
 {
     std::vector<std::unique_ptr<LogicExpression>> antecedent = {};
