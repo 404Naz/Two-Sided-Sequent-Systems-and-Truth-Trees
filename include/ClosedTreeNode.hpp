@@ -14,6 +14,10 @@ class ClosedTreeNode final : public LeafTreeNode {
     std::any Accept(TreeVisitor& visitor) const override;
     bool AddNode(std::unique_ptr<TreeNode> node) override;
     std::unique_ptr<LogicExpression> GetStatement() override;
+    bool SetAntecedent(int id) override
+    {
+        return false;
+    }
 
     int decomposition1;
     int decomposition2;

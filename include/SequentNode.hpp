@@ -35,7 +35,7 @@ class SequentNode {
     SequentNode() = default;
     virtual ~SequentNode() = default;
 
-    virtual std::any Accept(SequentVisitor& visitor) = 0;
+    virtual std::unique_ptr<TreeNode> Accept(SequentVisitor& visitor) = 0;
 
     SequentNodeRule rule = SequentNodeRule::None;
     std::vector<std::unique_ptr<LogicExpression>> antecedents;

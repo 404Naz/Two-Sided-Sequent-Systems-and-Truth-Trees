@@ -18,9 +18,13 @@ class SequentConverter final : public SequentVisitor {
     public:
     SequentConverter() = default;
 
-    std::any Visit(const UnarySequentNode& node) override;
-    std::any Visit(const BinarySequentNode& node) override;
+    std::any VisitOld(const UnarySequentNode& node);
+    std::any VisitOld(const BinarySequentNode& node);
+    std::unique_ptr<TreeNode> Visit(const UnarySequentNode& unary) override;
+    std::unique_ptr<TreeNode> Visit(const BinarySequentNode& binary) override;
     std::unique_ptr<TreeNode> ConvertToTree(SequentNode& node);
+
+    std::vector<std::unique_ptr<LogicExpression>> premises;
 
     std::vector<std::unique_ptr<TreeNode>> createdNodes;
     std::vector<int> createdNodesParentIds;

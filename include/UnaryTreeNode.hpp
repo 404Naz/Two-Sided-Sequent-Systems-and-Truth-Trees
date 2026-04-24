@@ -25,10 +25,15 @@ class UnaryTreeNode final : public TreeNode {
     bool AddNode(std::unique_ptr<TreeNode> node) override;
     std::unique_ptr<LogicExpression> GetStatement() override;
 
+    bool SetAntecedent(int id) override
+    {
+        antecedent = id;
+    }
+
     // Statement represented by this node
     std::unique_ptr<LogicExpression> statement;
     std::unique_ptr<TreeNode> child;
-    int antecedent{};
+    int antecedent = -1;
     int decomposition1 = -1;
     int decomposition2 = -1;
 };

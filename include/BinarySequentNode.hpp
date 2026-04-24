@@ -18,7 +18,7 @@ public:
     void SetLeftParent(SequentNode* left);
     void SetRightParent(SequentNode* right);
 
-    std::any Accept(SequentVisitor& visitor) override;
+    std::unique_ptr<TreeNode> Accept(SequentVisitor& visitor) override;
 
     SequentNode* leftParent = nullptr;
     SequentNode* rightParent = nullptr;

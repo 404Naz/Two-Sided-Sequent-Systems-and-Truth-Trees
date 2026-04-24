@@ -6,6 +6,8 @@
 #define SEQUENTSYSTEMSTOTRUTHTREES_SEQUENTVISITOR_HPP
 
 #include "LogicExpression.hpp"
+#include "TreeNode.hpp"
+
 #include <any>
 
 namespace Logic_Project {
@@ -17,8 +19,8 @@ class SequentVisitor {
 public:
     SequentVisitor() = default;
     virtual ~SequentVisitor() = default;
-    virtual std::any Visit(const UnarySequentNode& unary) = 0;
-    virtual std::any Visit(const BinarySequentNode& binary) = 0;
+    virtual std::unique_ptr<TreeNode> Visit(const UnarySequentNode& unary) = 0;
+    virtual std::unique_ptr<TreeNode> Visit(const BinarySequentNode& binary) = 0;
 };
 
 }
