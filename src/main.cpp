@@ -12,14 +12,16 @@
 #include <print>
 
 #include <BinarySequentNode.hpp>
+#include <LogicalOr.hpp>
 #include <SequentConverter.hpp>
 #include <TreeSerializer.hpp>
 #include <UnarySequentNode.hpp>
 
 using namespace Logic_Project;
 
-// #define EX1
-#define EX2
+#define EX0
+#define EX1
+// #define EX2
 // #define EX3
 
 int main(int, char**) {
@@ -28,6 +30,59 @@ int main(int, char**) {
     std::string result{};
     std::vector<std::unique_ptr<LogicExpression>> antecedent = {};
     std::vector<std::unique_ptr<LogicExpression>> succedent = {};
+#ifdef EX0
+    antecedent.clear();
+    succedent.clear();
+    antecedent.emplace_back(LogicalAtom{"A"}.Generalize());
+    succedent.push_back(LogicalOr{LogicalAtom{"A"}, LogicalAtom{"B"}}.Generalize());
+    UnarySequentNode A_AorB0 {antecedent, succedent};
+    A_AorB0.rule = SequentNodeRule::DisjR;
+    succedent.clear();
+    succedent.emplace_back(LogicalAtom{"A"}.Generalize());
+    succedent.emplace_back(LogicalAtom{"B"}.Generalize());
+    UnarySequentNode A_AB0{antecedent, succedent};
+    A_AB0.rule = SequentNodeRule::WR;
+    succedent.clear();
+    succedent.emplace_back(LogicalAtom{"A"}.Generalize());
+    UnarySequentNode A_A0{antecedent, succedent};
+    A_A0.rule = SequentNodeRule::None;
+    A_AB0.SetParent(&A_A0);
+    A_AorB0.SetParent(&A_AB0);
+
+    antecedent.clear();
+    succedent.clear();
+    antecedent.emplace_back(LogicalAtom{"B"}.Generalize());
+    succedent.push_back(LogicalOr{LogicalAtom{"A"}, LogicalAtom{"B"}}.Generalize());
+    UnarySequentNode B_AorB0 {antecedent, succedent};
+    B_AorB0.rule = SequentNodeRule::DisjR;
+    succedent.clear();
+    succedent.emplace_back(LogicalAtom{"A"}.Generalize());
+    succedent.emplace_back(LogicalAtom{"B"}.Generalize());
+    UnarySequentNode B_AB0{antecedent, succedent};
+    B_AB0.rule = SequentNodeRule::WR;
+    succedent.clear();
+    succedent.emplace_back(LogicalAtom{"B"}.Generalize());
+    UnarySequentNode B_B0{antecedent, succedent};
+    B_B0.rule = SequentNodeRule::None;
+    B_AB0.SetParent(&B_B0);
+    B_AorB0.SetParent(&B_AB0);
+
+    auto treeRoot01 = converter.ConvertToTree(A_AorB0);
+    auto treeRoot02 = converter.ConvertToTree(B_AorB0);
+
+    result = serializer.Serialize(*treeRoot01);
+
+    FILE* f0 = fopen("ex0A.willow", "w");
+    fprintf(f0, "%s\n", result.c_str());
+    fclose(f0);
+
+    result = serializer.Serialize(*treeRoot02);
+
+    f0 = fopen("ex0B.willow", "w");
+    fprintf(f0, "%s\n", result.c_str());
+    fclose(f0);
+#endif
+
 #ifdef EX1
     antecedent.clear();
     antecedent.emplace_back(LogicalAtom{"B"}.Generalize());

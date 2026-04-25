@@ -118,6 +118,7 @@ std::string TreeSerializer::Serialize() const
 }
 std::string TreeSerializer::Serialize(const TreeNode& root)
 {
+    serializedNodes.clear();
     root.Accept(*this);
     return this->Serialize();
 }
