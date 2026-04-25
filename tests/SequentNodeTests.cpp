@@ -145,7 +145,7 @@ TEST_CASE("SequentConversion - None and ConjR", "[SequentConverter][TreeNodeSeri
     auto treeRoot = converter.ConvertToTree(BC_BandC);
     REQUIRE(treeRoot != nullptr);
     std::string result = serializer.Serialize(*treeRoot);
-    std::string expected = R"aa({"nodes":[{"id":0,"text":"B","children":[1],"decomposition":[],"premise":true},{"id":1,"text":"C","children":[2],"decomposition":[],"parent":0,"premise":true},{"id":2,"text":"¬(B ∧ C)","children":[4,3],"decomposition":[3,4],"parent":1,"premise":true},{"id":4,"text":"¬C","children":[6],"decomposition":[],"parent":2,"antecedent":2,"premise":false},{"id":6,"text":"×","children":[],"decomposition":[1,4],"parent":4},{"id":3,"text":"¬B","children":[5],"decomposition":[],"parent":2,"antecedent":2,"premise":false},{"id":5,"text":"×","children":[],"decomposition":[0,3],"parent":3}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
+    std::string expected = R"aa({"nodes":[{"id":6,"text":"¬(B ∧ C)","children":[1,4],"decomposition":[1,4],"premise":true},{"id":1,"text":"¬B","children":[0],"decomposition":[],"parent":6,"antecedent":6,"premise":false},{"id":0,"text":"B","children":[2],"decomposition":[],"parent":1,"premise":true},{"id":2,"text":"×","children":[],"decomposition":[0,1],"parent":0},{"id":4,"text":"¬C","children":[3],"decomposition":[],"parent":6,"antecedent":6,"premise":false},{"id":3,"text":"C","children":[5],"decomposition":[],"parent":4,"premise":true},{"id":5,"text":"×","children":[],"decomposition":[3,4],"parent":3}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
 
     CAPTURE(result);
     REQUIRE(result == expected);
@@ -267,7 +267,7 @@ TEST_CASE("SequentConversion - ImplL", "[SequentConverter][TreeNodeSerializer]")
     auto treeRoot = converter.ConvertToTree(AtoB);
     REQUIRE(treeRoot != nullptr);
     std::string result = serializer.Serialize(*treeRoot);
-    std::string expected = R"aa({"nodes":[{"id":0,"text":"(A → B)","children":[2,1],"decomposition":[1,2],"premise":true},{"id":2,"text":"B","children":[],"decomposition":[],"parent":0,"antecedent":0,"premise":false},{"id":1,"text":"¬A","children":[],"decomposition":[],"parent":0,"antecedent":0,"premise":false}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
+    std::string expected = R"aa({"nodes":[{"id":0,"text":"(A → B)","children":[1,2],"decomposition":[1,2],"premise":true},{"id":1,"text":"¬A","children":[],"decomposition":[],"parent":0,"antecedent":0,"premise":false},{"id":2,"text":"B","children":[],"decomposition":[],"parent":0,"antecedent":0,"premise":false}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
 
     CAPTURE(result);
     REQUIRE(result == expected);
@@ -301,7 +301,7 @@ TEST_CASE("SequentConversion - DisjL", "[SequentConverter][TreeNodeSerializer]")
     auto treeRoot = converter.ConvertToTree(AorB);
     REQUIRE(treeRoot != nullptr);
     std::string result = serializer.Serialize(*treeRoot);
-    std::string expected = R"aa({"nodes":[{"id":0,"text":"(A ∨ B)","children":[2,1],"decomposition":[1,2],"premise":true},{"id":2,"text":"B","children":[],"decomposition":[],"parent":0,"antecedent":0,"premise":false},{"id":1,"text":"A","children":[],"decomposition":[],"parent":0,"antecedent":0,"premise":false}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
+    std::string expected = R"aa({"nodes":[{"id":0,"text":"(A ∨ B)","children":[1,2],"decomposition":[1,2],"premise":true},{"id":1,"text":"A","children":[],"decomposition":[],"parent":0,"antecedent":0,"premise":false},{"id":2,"text":"B","children":[],"decomposition":[],"parent":0,"antecedent":0,"premise":false}],"options":{"requireAtomicContradiction":true,"requireAllBranchesTerminated":true,"lockedOptions":false}})aa";
 
     CAPTURE(result);
     REQUIRE(result == expected);
