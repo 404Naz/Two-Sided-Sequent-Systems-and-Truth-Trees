@@ -73,19 +73,201 @@ The sequent system we are using has the following rules of operation. $\Gamma$ a
 \frac{\Gamma \sep \Delta, A, B, \Lambda}{\Gamma \sep \Delta, B, A, \Lambda} XR
 \]
 \subsection*{File Layout}
-The sequent system will be formatted as a json with a list of nodes containing their node ID, antecedent/succedent, the node ids used to get there and the rule used to get there, going from goal upwards. For example, the following sequent:
+Sequent derivations are represented in code as a tree of \texttt{SequentNode} objects. Each node stores its antecedent and succedent formula lists, the rule that was applied (\texttt{SequentNodeRule} enum), and pointers to parent node(s). \texttt{UnarySequentNode} handles rules with a single premise; \texttt{BinarySequentNode} handles rules with two premises (e.g., $\land R$, $\lor L$, $\to L$). The \texttt{SequentConverter} walks this structure and produces the corresponding truth tree in Willow-compatible format.
+
+For example, the derivation:
 $$\frac{\frac{\frac{A \sep A}{B, A \sep A}WL}{A, B \sep A}XL \qquad \frac{B \sep B}{A, B \sep B}WL}{A, B\sep A \land B} \land R$$
-would be represented as:
-!!! TODO !!!
+
+\noindent is constructed bottom-up as a \texttt{BinarySequentNode} (for $\land R$) whose left and right parents are \texttt{UnarySequentNode} chains applying the structural rules.
+
 \pagebreak
 
 \section*{Truth Tree Rules (Propositional Calculus)}
+
+Truth trees systematically test the satisfiability of a set of formulas by decomposing compound statements into simpler components, branching when multiple possibilities must be explored.
+
 \subsection*{Decomposition Rules}
+
+A decomposable statement is any statement that is not a literal (i.e., not an atomic or the negation of an atomic). A checkmark ($\checkmark$) is placed next to a formula after it has been decomposed.
+
+\subsubsection*{Non-Branching (Linear) Rules}
+
+These rules add formulas to the current branch without splitting:
+
+\[
+\frac{P \land Q}{P \quad Q} \qquad \qquad
+\frac{\neg(P \lor Q)}{\neg P \quad \neg Q} \qquad \qquad
+\frac{\neg(P \to Q)}{P \quad \neg Q} \qquad \qquad
+\frac{\neg\neg P}{P}
+\]
+
+In each case, \textit{both} resulting formulas are added to the same branch, one after the other.
+
+\subsubsection*{Branching Rules}
+
+These rules split the current branch into two sub-branches:
+
+\[
+\frac{P \lor Q}{P \mid Q} \qquad \qquad
+\frac{P \to Q}{\neg P \mid Q} \qquad \qquad
+\frac{\neg(P \land Q)}{\neg P \mid \neg Q}
+\]
+
+\subsubsection*{Biconditional Rules}
+
+\[
+\frac{P \leftrightarrow Q}{\begin{array}{c|c} P & \neg P \\ Q & \neg Q \end{array}}
+\qquad \qquad
+\frac{\neg(P \leftrightarrow Q)}{\begin{array}{c|c} P & \neg P \\ \neg Q & Q \end{array}}
+\]
+
+The vertical bar ($\mid$) denotes a branch point.
+
 \subsection*{Closure Rules}
+
+A branch is \textbf{closed} ($\times$) if a formula and its negation both appear on that branch:
+\[
+\frac{\varphi \qquad \neg\varphi}{\times}
+\]
+
+A branch is \textbf{open} ($\circ$) and \textbf{finished} if all decomposable statements have been decomposed and no closure condition is met.
+
+\subsection*{Interpretation}
+
+\begin{itemize}[nosep]
+    \item If all branches close: the root formulas are jointly unsatisfiable.
+    \item If any branch is open and finished: the root formulas are jointly satisfiable.
+\end{itemize}
+
+\subsection*{Applications}
+
+\begin{itemize}[nosep]
+    \item \textbf{Validity:} To test $A_1, \ldots, A_n \vdash B$, write $A_1, \ldots, A_n, \neg B$ at the root. All branches close $\Rightarrow$ valid.
+    \item \textbf{Tautology:} Write $\neg\varphi$ at the root. All branches close $\Rightarrow$ tautology.
+    \item \textbf{Equivalence:} $\varphi \equiv \psi$ iff both $\{\varphi, \neg\psi\}$ and $\{\neg\varphi, \psi\}$ are unsatisfiable.
+\end{itemize}
+
 \subsection*{File Layout}
-The truth tree will be formatted into a json-like form for use in Willow. 
+The truth tree is serialized into Willow-compatible JSON by the \texttt{TreeSerializer}. Each node is an object with the following fields:
+
+\begin{itemize}[nosep]
+    \item \texttt{id}: unique integer identifier
+    \item \texttt{text}: the formula string (e.g., \texttt{"A"}, \texttt{"(A $\land$ B)"}, \texttt{"$\times$"}, \texttt{"$\circ$"})
+    \item \texttt{children}: array of child node IDs
+    \item \texttt{decomposition}: array of node IDs that justify this node
+    \item \texttt{parent}: ID of the parent node (absent for root)
+    \item \texttt{antecedent}: ID of the node this was decomposed from
+    \item \texttt{premise}: boolean indicating whether this is a root-level premise
+\end{itemize}
+
+The complete output is wrapped as:
+\begin{verbatim}
+{
+  "nodes": [ ... ],
+  "options": {
+    "requireAtomicContradiction": true,
+    "requireAllBranchesTerminated": true,
+    "lockedOptions": false
+  }
+}
+\end{verbatim}
+
 \pagebreak
 
-\section*{Putting them together}
+\section*{Putting Them Together: Sequent Derivations and Truth Trees}
+
+The central insight is that \textbf{sequent calculus derivations are truth trees turned upside down}.
+
+\subsection*{Axiom and Closure}
+
+The LK initial sequent $A \sep A$ corresponds to truth tree closure. By $\neg L$, we derive $\neg A, A \sep$ (i.e., $\neg A, A \sep \bot$). In truth trees, both $A$ and $\neg A$ on the same branch triggers closure ($\times$).
+
+\[
+A \sep A \quad \approx \quad
+\begin{array}{c}
+A \\ \neg A \\ \times
+\end{array}
+\]
+
+\subsection*{Structural Rules}
+
+Structural rules in LK have no formal counterparts in truth trees, but are reflected informally:
+
+\begin{itemize}[nosep]
+    \item \textbf{Contraction} $\approx$ A formula can be reused on the same branch
+    \item \textbf{Weakening} $\approx$ Redundant/unused formulas on a branch
+    \item \textbf{Exchange} $\approx$ Decomposition order is irrelevant
+\end{itemize}
+
+\subsection*{Negation}
+
+$\neg$ rules in LK are reflected in truth trees when applied twice (double negation $\neg\neg P \leadsto P$). Single applications of $\neg L / \neg R$ correspond to the formula's position on the left (assumed true) versus right (assumed false) of $\sep$.
+
+\subsection*{Operational Rule Correspondences}
+
+L-rules (preserving truth upward) trigger decomposition of the unsigned formula. R-rules (preserving falsity upward) trigger decomposition of the negated formula.
+
+\subsubsection*{L-Rules $\to$ Decomposition of $A \circ B$}
+
+\[
+\frac{A, B \sep}{\underset{\land L}{A \land B \sep}}
+\quad \approx \quad
+\begin{array}{c} A \land B \\ A \\ B \end{array}
+\qquad\qquad
+\frac{A \sep \quad B \sep}{\underset{\lor L}{A \lor B \sep}}
+\quad \approx \quad
+\begin{array}{c} A \lor B \\ \swarrow \quad \searrow \\ A \qquad B \end{array}
+\]
+
+\[
+\frac{\sep A \quad B \sep}{\underset{\to L}{A \to B \sep}}
+\quad \approx \quad
+\begin{array}{c} A \to B \\ \swarrow \quad \searrow \\ \neg A \qquad B \end{array}
+\]
+
+\subsubsection*{R-Rules $\to$ Decomposition of $\neg(A \circ B)$}
+
+\[
+\frac{\sep A \quad \sep B}{\underset{\land R}{\sep A \land B}}
+\quad \approx \quad
+\begin{array}{c} \neg(A \land B) \\ \swarrow \quad \searrow \\ \neg A \qquad \neg B \end{array}
+\qquad\qquad
+\frac{\sep A, B}{\underset{\lor R}{\sep A \lor B}}
+\quad \approx \quad
+\begin{array}{c} \neg(A \lor B) \\ \neg A \\ \neg B \end{array}
+\]
+
+\[
+\frac{A \sep B}{\underset{\to R}{\sep A \to B}}
+\quad \approx \quad
+\begin{array}{c} \neg(A \to B) \\ A \\ \neg B \end{array}
+\]
+
+\subsection*{Summary Table}
+
+\begin{center}
+\begin{tabular}{l|l|l}
+\textbf{Sequent Rule} & \textbf{Truth Tree Operation} & \textbf{Type} \\
+\hline
+$\land L$ & Decompose $A \land B$ (non-branching) & Linear \\
+$\lor L$ & Decompose $A \lor B$ (branching) & Branch \\
+$\to L$ & Decompose $A \to B$ (branching) & Branch \\
+$\land R$ & Decompose $\neg(A \land B)$ (branching) & Branch \\
+$\lor R$ & Decompose $\neg(A \lor B)$ (non-branching) & Linear \\
+$\to R$ & Decompose $\neg(A \to B)$ (non-branching) & Linear \\
+$\neg L / \neg R$ & Double negation (when applied twice) & Linear \\
+Axiom $A \sep A$ & Closure ($\times$) & Leaf \\
+\end{tabular}
+\end{center}
+
+\subsection*{Note on Modified Rules}
+
+This project uses the modified (reversible) versions of $\land L$ and $\lor R$:
+\[
+\frac{A, B, \Gamma \sep \Delta}{A \land B, \Gamma \sep \Delta} \land L'
+\qquad \qquad
+\frac{\Gamma \sep \Delta, A, B}{\Gamma \sep \Delta, A \lor B} \lor R'
+\]
+These preserve both operands in the premise, making the rules reversible. In standard LK, $\land L$ and $\lor R$ are lossy when read bottom-to-top.
 
 \end{document}
