@@ -260,14 +260,14 @@ Axiom $A \sep A$ & Closure ($\times$) & Leaf \\
 \end{tabular}
 \end{center}
 
-\subsection*{Note on Modified Rules}
+\subsection*{Note on $\land L$ and $\lor R$}
 
-This project uses the modified (reversible) versions of $\land L$ and $\lor R$:
+For this project, we define $\land L$ and $\lor R$ as follows:
 \[
-\frac{A, B, \Gamma \sep \Delta}{A \land B, \Gamma \sep \Delta} \land L'
+\frac{A, B, \Gamma \sep \Delta}{A \land B, \Gamma \sep \Delta} \land L
 \qquad \qquad
-\frac{\Gamma \sep \Delta, A, B}{\Gamma \sep \Delta, A \lor B} \lor R'
+\frac{\Gamma \sep \Delta, A, B}{\Gamma \sep \Delta, A \lor B} \lor R
 \]
-These preserve both operands in the premise, making the rules reversible. In standard LK, $\land L$ and $\lor R$ are lossy when read bottom-to-top.
+These versions preserve both operands in the premise, making them reversible (the inference line is a biconditional). This avoids the ``lossy'' behavior of the standard formulation, where one operand is discarded when reading bottom-to-top.
 
 \end{document}
