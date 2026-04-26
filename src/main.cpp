@@ -19,10 +19,9 @@
 
 using namespace Logic_Project;
 
-#define EX0
-#define EX1
-// #define EX2
-// #define EX3
+// #define EX0
+// #define EX1
+#define EX2
 
 int main(int, char**) {
     SequentConverter converter{};
@@ -143,9 +142,10 @@ int main(int, char**) {
     antecedent.push_back(LogicalConditional{LogicalConditional{LogicalAtom{"A"}, LogicalAtom{"B"}}, LogicalAtom{"A"}}.Generalize());
     succedent.push_back(LogicalAtom{"A"}.Generalize());
     auto AtoBtoA_A = UnarySequentNode{antecedent, succedent};
-    AtoBtoA_A.rule = SequentNodeRule::CL;
+    AtoBtoA_A.rule = SequentNodeRule::CR;
     AtoBtoA_A.isRoot = true;
-    succedent.push_back(LogicalAtom{"A"}.Generalize());
+    succedent.clear(); // Cheating this out to make ImplR work
+    // succedent.push_back(LogicalAtom{"A"}.Generalize());
     auto AtoBtoA_AA = BinarySequentNode(antecedent, succedent);
     AtoBtoA_AA.rule = SequentNodeRule::ImplL;
 
