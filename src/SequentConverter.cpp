@@ -615,12 +615,11 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const UnarySequentNode& unary)
                     if (foundMatch) {
                         diffP = eq2->Copy();
                         diffN = LogicalNot{*eq2->Generalize()}.Generalize();
+                        assert(!diffN->Equals(*eq2)); // should not call copy constructor, if it does, then I need to check and catch that
                     } else {
                         diffP = LogicalNot{*eq->Copy()}.Generalize();
-                        diffN = LogicalNot{LogicalNot{*eq->Generalize()}}.Generalize();
+                        diffN = eq->Copy(); // explicitly construct, rather than copy
                     }
-
-                    assert(!diffN->Equals(*eq2)); // should not call copy constructor, if it does, then I need to check and catch that
                     // normal is first, premise is second, if DN, connect X to remove before
                     auto premise = std::make_unique<UnaryTreeNode>(*diffP);
                     premise->isPremise = true;
@@ -675,7 +674,7 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const UnarySequentNode& unary)
             }
         }
         if (foundMatch) {
-            fprintf(stderr, "Wrong rule or missing change.\n");
+            fprintf(stderr, "Wrong rule or missing change - ConjL.\n");
             return nullptr;
         }
 
@@ -746,7 +745,7 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const UnarySequentNode& unary)
             }
         }
         if (foundMatch) {
-            fprintf(stderr, "Wrong rule or missing change.\n");
+            fprintf(stderr, "Wrong rule or missing change - DisjR.\n");
             return nullptr;
         }
 
@@ -781,6 +780,9 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const UnarySequentNode& unary)
             child2 = std::move(childTreeNode);
         } else {
             child2 = std::make_unique<UnaryTreeNode>(*diffC2);
+            if (auto* unaryChild2 = dynamic_cast<UnaryTreeNode*>(child2.get())) {
+                unaryChild2->SetChild(std::move(childTreeNode));
+            }
         }
         child2->SetAntecedent(parent->GetId());
         child1->SetAntecedent(parent->GetId());
@@ -805,6 +807,7 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const UnarySequentNode& unary)
         // one difference expected
         bool foundMatch = false;
         for (auto& eq: unary.succedents) {
+            foundMatch = false;
             for (auto& eq2 : unary.parent->succedents) {
                 if (eq->Equals(*eq2)) {
                     foundMatch = true;
@@ -817,7 +820,7 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const UnarySequentNode& unary)
             }
         }
         if (foundMatch) {
-            fprintf(stderr, "Wrong rule or missing change.\n");
+            fprintf(stderr, "Wrong rule or missing change - ImplR.\n");
             return nullptr;
         }
 
@@ -853,7 +856,12 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const UnarySequentNode& unary)
                 }
             }
             if (!foundMatch) {
-                diffC2 = LogicalNot{*eq->Copy()}.Generalize();
+                if (diffC1 == nullptr) {
+                    diffC1 = LogicalNot{*eq->Copy()}.Generalize();
+                } else {
+                    diffC2 = LogicalNot{*eq->Copy()}.Generalize();
+                }
+
             }
         }
         auto parent = std::make_unique<UnaryTreeNode>(*diffP);
@@ -864,6 +872,9 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const UnarySequentNode& unary)
             child2 = std::move(childTreeNode);
         } else {
             child2 = std::make_unique<UnaryTreeNode>(*diffC2);
+            if (auto* unaryChild2 = dynamic_cast<UnaryTreeNode*>(child2.get())) {
+                unaryChild2->SetChild(std::move(childTreeNode));
+            }
         }
         child2->SetAntecedent(parent->GetId());
         child1->SetAntecedent(parent->GetId());
@@ -878,9 +889,6 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const UnarySequentNode& unary)
             }
         }
         return std::move(parent);
-
-        fprintf(stderr, "ImplR not implemented\n");
-        return nullptr;
     } else if (unary.rule == SequentNodeRule::NegL || unary.rule == SequentNodeRule::NegR ||
         unary.rule == SequentNodeRule::WL || unary.rule == SequentNodeRule::WR ||
         unary.rule == SequentNodeRule::CL || unary.rule == SequentNodeRule::CR ||
@@ -967,6 +975,7 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const BinarySequentNode& binar
         } else {
             auto treeNodeL = std::make_unique<UnaryTreeNode>(*diffL);
             treeNodeL->antecedent = treeNodeP->GetId();
+            treeNodeL->SetChild(std::move(leftChildTreeNode));
             treeNodeP->SetLeftChild(std::move(treeNodeL));
         }
         if (rightChildTreeNode != nullptr && rightChildTreeNode->GetStatement() != nullptr && rightChildTreeNode->GetStatement()->Equals(*diffR)) {
@@ -975,6 +984,7 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const BinarySequentNode& binar
         } else {
             auto treeNodeR = std::make_unique<UnaryTreeNode>(*diffR);
             treeNodeR->antecedent = treeNodeP->GetId();
+            treeNodeR->SetChild(std::move(rightChildTreeNode));
             treeNodeP->SetRightChild(std::move(treeNodeR));
         }
         treeNodeP->decomposition1 = treeNodeP->left->GetId();
@@ -1046,6 +1056,7 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const BinarySequentNode& binar
         } else {
             auto treeNodeL = std::make_unique<UnaryTreeNode>(*diffL);
             treeNodeL->antecedent = treeNodeP->GetId();
+            treeNodeL->SetChild(std::move(leftChildTreeNode));
             treeNodeP->SetLeftChild(std::move(treeNodeL));
         }
         if (rightChildTreeNode != nullptr && rightChildTreeNode->GetStatement() != nullptr && rightChildTreeNode->GetStatement()->Equals(*diffR)) {
@@ -1054,6 +1065,7 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const BinarySequentNode& binar
         } else {
             auto treeNodeR = std::make_unique<UnaryTreeNode>(*diffR);
             treeNodeR->antecedent = treeNodeP->GetId();
+            treeNodeR->SetChild(std::move(rightChildTreeNode));
             treeNodeP->SetRightChild(std::move(treeNodeR));
         }
         treeNodeP->decomposition1 = treeNodeP->left->GetId();
@@ -1125,6 +1137,7 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const BinarySequentNode& binar
         } else {
             auto treeNodeL = std::make_unique<UnaryTreeNode>(*diffL);
             treeNodeL->antecedent = treeNodeP->GetId();
+            treeNodeL->SetChild(std::move(leftChildTreeNode));
             treeNodeP->SetLeftChild(std::move(treeNodeL));
         }
         if (rightChildTreeNode != nullptr && rightChildTreeNode->GetStatement() != nullptr && rightChildTreeNode->GetStatement()->Equals(*diffR)) {
@@ -1133,6 +1146,7 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const BinarySequentNode& binar
         } else {
             auto treeNodeR = std::make_unique<UnaryTreeNode>(*diffR);
             treeNodeR->antecedent = treeNodeP->GetId();
+            treeNodeR->SetChild(std::move(rightChildTreeNode));
             treeNodeP->SetRightChild(std::move(treeNodeR));
         }
         treeNodeP->decomposition1 = treeNodeP->left->GetId();
@@ -1143,8 +1157,6 @@ std::unique_ptr<TreeNode> SequentConverter::Visit(const BinarySequentNode& binar
             }
         }
         return treeNodeP;
-        fprintf(stderr, "ImplL not implemented\n");
-        return nullptr;
     }
     fprintf(stderr, "Incorrect node type for rule provided.\n");
     return nullptr;
