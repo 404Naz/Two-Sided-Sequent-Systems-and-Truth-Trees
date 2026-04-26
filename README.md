@@ -31,7 +31,7 @@ There are basically three layers:
 
 **Tree nodes** — the truth tree structure. `UnaryTreeNode` for linear steps (one child), `BinaryTreeNode` for branches (two children), `ClosedTreeNode` (×) when you find a contradiction, `OpenTreeNode` (◯) when a branch has no contradiction. Each node gets a unique ID that the serializer uses.
 
-**Sequent nodes** — `SequentNode` with antecedent/succedent lists and a rule enum for all the sequent rules (¬L/R, ∧L/R, ∨L/R, →L/R, plus weakening/contraction/exchange). This part is scaffolding for now — the actual conversion algorithm isn't wired up yet.
+**Sequent nodes** — `SequentNode` with antecedent/succedent lists and a rule enum for all the sequent rules (¬L/R, ∧L/R, ∨L/R, →L/R, plus weakening/contraction/exchange). `UnarySequentNode` handles single-premise rules, `BinarySequentNode` handles two-premise rules. The `SequentConverter` walks the sequent derivation tree and builds the corresponding truth tree.
 
 **Serializer** — `TreeSerializer` walks the truth tree via visitor pattern and spits out JSON that Willow can read. Format looks like:
 
@@ -88,11 +88,11 @@ Quick reference for how sequent rules map to tree shapes:
 | →L | Branch | Branches into ¬A and B |
 | →R | Linear | Adds A and ¬B to branch |
 
-## What's done and what's not
+## Status
 
-Done: expression AST, tree nodes, serializer, visitor infrastructure, sequent node types, some unit tests.
+Done: expression AST, tree nodes, serializer, visitor infrastructure, sequent node types, sequent-to-tree conversion (`SequentConverter`), unit tests, conversion examples.
 
-Still needs work: the actual conversion algorithm between sequent proofs and truth trees, a parser for input, and the truth tree rules section of the paper.
+Still needs work: a parser for formula input (currently formulas are built in code), and biconditional support.
 
 ## Licensing
 
